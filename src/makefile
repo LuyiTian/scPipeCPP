@@ -17,12 +17,12 @@ RM = rm -rf
 
 .PHONY: all buildhts buildtest runtest test buildPipe install
 
-%.o: %.cpp $(HTS_DIR)/htslib/sam.h
+%.o: %.cpp $(HTS_DIR)
 	$(CXX) -c $(CPPFLAGS) $(LIBS) -o $@ $<
 
 all: buildPipe
 
-$(HTS_DIR)/htslib/sam.h:
+$(HTS_DIR):
 	mkdir -p $(HTS_DIR) &&\
 	cd htslib-1.3 && \
 	make clean && \
