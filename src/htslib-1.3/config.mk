@@ -28,7 +28,7 @@
 # in the Makefile to reflect your configuration choices.  If you don't run
 # configure, the main Makefile contains suitable conservative defaults.
 
-prefix       = /Users/luyi/git/scQC/src/hts
+prefix       = /Users/su.s/Programs/CPP/scPipe/src/hts
 exec_prefix  = ${prefix}
 bindir       = ${exec_prefix}/bin
 includedir   = ${prefix}/include
@@ -37,7 +37,7 @@ libexecdir   = ${exec_prefix}/libexec
 datarootdir  = ${prefix}/share
 mandir       = ${datarootdir}/man
 
-CC     = gcc-5
+CC     = /usr/bin/clang
 RANLIB = ranlib
 
 CPPFLAGS = 
