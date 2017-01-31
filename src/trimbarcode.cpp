@@ -3,8 +3,8 @@
 
 void kseq_t_to_bam_t(kseq_t *seq, bam1_t *b, int trim_n)
 {
-    int seq_l = seq->seq.l-trim_n; // seq length after trim the barcode
-    b->l_data = seq->name.l+1+(int)(1.5*seq_l+(seq_l % 2 != 0)); // +1 includes the tailing '\0'
+    int seq_l = seq->seq.l - trim_n; // seq length after trim the barcode
+    b->l_data = seq->name.l + 1 + (int)(1.5 * seq_l + (seq_l % 2 != 0)); // +1 includes the tailing '\0'
     if (b->m_data < b->l_data) 
     {
         b->m_data = b->l_data;
@@ -16,22 +16,23 @@ void kseq_t_to_bam_t(kseq_t *seq, bam1_t *b, int trim_n)
     b->core.mtid = -1;
     b->core.mpos = -1;
     b->core.flag = BAM_FUNMAP;
-    b->core.l_qname = seq->name.l+1; // +1 includes the tailing '\0'
+    b->core.l_qname = seq->name.l + 1; // +1 includes the tailing '\0'
     b->core.l_qseq = seq_l;
     b->core.n_cigar = 0; // we have no cigar sequence
-    memcpy(b->data, seq->name.s, sizeof(char)*seq->name.l); // first set qname
+    memcpy(b->data, seq->name.s, sizeof(char) * seq->name.l); // first set qname
     b->data[seq->name.l] = '\0';
     uint8_t *s = bam_get_seq(b);
     int i = 0;
-    for (i = 0; i < b->core.l_qseq; ++i) // set sequence
+    for (i = 0; i < b->core.l_qseq;++i) // set sequence
     {
-
-        bam1_seq_seti(s, i, seq_nt16_table[seq->seq.s[i+trim_n]]);
+        bam1_seq_seti(s, i, seq_nt16_table[seq->seq.s[i + trim_n]]);
     }
+
     s = bam_get_qual(b);
-    for (i = 0; i < b->core.l_qseq; ++i) // set quality
+
+    for (i = 0; i < b->core.l_qseq;++i) // set quality
     {
-        s[i] = seq->qual.s[i+trim_n]-33;
+        s[i] = seq->qual.s[i + trim_n]-33;
     }
 }
 
@@ -72,6 +73,7 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, read_s r, fi
 
     int l1 = 0;
     int l2 = 0;
+
     gzFile fq1 = gzopen(fq1_fn, "r"); // input fastq
     if (!fq1){fprintf(stderr, "cant open file: %s\n", fq1_fn); exit(EXIT_FAILURE);}
     gzFile fq2 = gzopen(fq2_fn, "r");
@@ -86,37 +88,37 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, read_s r, fi
     hdr->n_targets = 0;
     sam_hdr_write(fp, hdr);
 
-    uint8_t *se = new uint8_t[r.id1_len+r.id2_len+1];
-    uint8_t *umi = new uint8_t[r.umi_len+1];
+    uint8_t *se = new uint8_t[r.id1_len + r.id2_len + 1];
+    uint8_t *umi = new uint8_t[r.umi_len + 1];
 
-    int bc1_end, bc2_end; // get total length of index+UMI for read1 and read2
+    int bc1_end, bc2_end; // get total length of index + UMI for read1 and read2
     int state; // 0 for two index with umi, 1 for two index without umi, 2 for one index with umi, 3 for one index without umi
     if (r.id1_st>=0) // if we have plate index
     {
         state = 0;
-        bc1_end = r.id1_st+r.id1_len;
+        bc1_end = r.id1_st + r.id1_len;
     }
     else // if dont have plate, use r.id1_len to trim the read 1
     {
         state = 2;
         bc1_end = r.id1_len;
-        uint8_t *idx = new uint8_t[r.id2_len+1];
+        uint8_t *idx = new uint8_t[r.id2_len + 1];
     }
     if (r.umi_st >= 0)
     {
-        if (r.id2_st+r.id2_len > r.umi_st+r.umi_len)
+        if (r.id2_st + r.id2_len > r.umi_st + r.umi_len)
         {
-            bc2_end = r.id2_st+r.id2_len;
+            bc2_end = r.id2_st + r.id2_len;
         }
         else
         {
-            bc2_end = r.umi_st+r.umi_len;
+            bc2_end = r.umi_st + r.umi_len;
         }
     }
     else
     {
         state++; // no umi
-        bc2_end = r.id2_st+r.id2_len;
+        bc2_end = r.id2_st + r.id2_len;
     }
 
     int name_offset;
@@ -137,8 +139,6 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, read_s r, fi
         name_offset = r.id2_len + 2;
     }
 
-
-
     kseq_t *seq1;
     seq1 =  kseq_init(fq1);
     kseq_t *seq2;
@@ -152,7 +152,7 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, read_s r, fi
         {
             if(!(check_qual(seq1->seq.s, bc1_end, fl.min_qual, fl.num_below_min) && check_qual(seq2->seq.s, bc2_end, fl.min_qual, fl.num_below_min)))
             {
-                removed_low_qual ++;
+                removed_low_qual++;
                 continue;
             }
         }
@@ -160,7 +160,7 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, read_s r, fi
         {
             if(!(N_check(seq1->seq.s, bc1_end) && N_check(seq2->seq.s, bc2_end)))
             {
-                removed_have_N ++;
+                removed_have_N++;
                 continue;
             }
         }
@@ -170,30 +170,30 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, read_s r, fi
         bam1_t *b = bam_init1();
 
         seq1->name.s = (char*)realloc(seq1->name.s, name_offset + seq1->name.l);
-        memcpy(seq1->name.s+name_offset, seq1->name.s, seq1->name.l*sizeof(char)); // move original read name
+        memcpy(seq1->name.s + name_offset, seq1->name.s, seq1->name.l*sizeof(char)); // move original read name
         if (state == 0)
         {
-            memcpy(seq1->name.s, seq1->seq.s+r.id1_st, r.id1_len*sizeof(char)); // copy index one
-            memcpy(seq1->name.s+r.id1_len, seq2->seq.s+r.id2_st, r.id2_len*sizeof(char)); // copy index two
-            seq1->name.s[r.id1_len+r.id2_len] = '_'; // add separater
-            memcpy(seq1->name.s+r.id1_len+r.id2_len+1, seq2->seq.s+r.umi_st, r.umi_len*sizeof(char)); // copy umi
+            memcpy(seq1->name.s, seq1->seq.s + r.id1_st, r.id1_len*sizeof(char)); // copy index one
+            memcpy(seq1->name.s + r.id1_len, seq2->seq.s + r.id2_st, r.id2_len*sizeof(char)); // copy index two
+            seq1->name.s[r.id1_len + r.id2_len] = '_'; // add separater
+            memcpy(seq1->name.s + r.id1_len + r.id2_len + 1, seq2->seq.s + r.umi_st, r.umi_len*sizeof(char)); // copy umi
 
         }
         else if (state == 1)
         {
-            memcpy(seq1->name.s, seq1->seq.s+r.id1_st, r.id1_len*sizeof(char)); // copy index one
-            memcpy(seq1->name.s+r.id1_len, seq2->seq.s+r.id2_st, r.id2_len*sizeof(char)); // copy index two
-            seq1->name.s[r.id1_len+r.id2_len] = '_'; // add separater
+            memcpy(seq1->name.s, seq1->seq.s + r.id1_st, r.id1_len*sizeof(char)); // copy index one
+            memcpy(seq1->name.s + r.id1_len, seq2->seq.s + r.id2_st, r.id2_len*sizeof(char)); // copy index two
+            seq1->name.s[r.id1_len + r.id2_len] = '_'; // add separater
         }
         else if (state == 2)
         {
-            memcpy(seq1->name.s, seq2->seq.s+r.id2_st, r.id2_len*sizeof(char)); // copy index two
+            memcpy(seq1->name.s, seq2->seq.s + r.id2_st, r.id2_len*sizeof(char)); // copy index two
             seq1->name.s[r.id2_len] = '_'; // add separater
-            memcpy(seq1->name.s+r.id2_len+1, seq2->seq.s+r.umi_st, r.umi_len*sizeof(char)); // copy umi
+            memcpy(seq1->name.s + r.id2_len + 1, seq2->seq.s + r.umi_st, r.umi_len*sizeof(char)); // copy umi
         }
         else if (state == 3)
         {
-            memcpy(seq1->name.s, seq2->seq.s+r.id2_st, r.id2_len*sizeof(char)); // copy index two
+            memcpy(seq1->name.s, seq2->seq.s + r.id2_st, r.id2_len*sizeof(char)); // copy index two
             seq1->name.s[r.id2_len] = '_'; // add separater
         }
         seq1->name.s[name_offset-1] = '#';
