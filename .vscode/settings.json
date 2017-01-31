@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "unordered_map": "cpp",
+        "*h*h*hhashtable": "cpp",
+        "*htype_traits": "cpp",
+        "*hexception": "cpp",
+        "*htypeinfo": "cpp",
+        "*h*h*hnew": "cpp"
+    }
+}
