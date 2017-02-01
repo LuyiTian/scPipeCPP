@@ -50,6 +50,7 @@ clean:
 	$(RM) $(OBJS)
 	$(RM) test/basic_test
 	$(RM) ./bin
+	$(RM) hts
 
 install:
 	cp bin/sc_demultiplex $INSTALL_PATH/bin/
