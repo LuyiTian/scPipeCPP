@@ -6,7 +6,10 @@
 
 DIR = $(shell pwd)
 HTS_DIR = $(DIR)/hts
-INSTALL_PATH ?= /usr/local
+prefix ?= /usr/local
+
+INSTALL = install -p
+INSTALL_PROGRAM = $(INSTALL)
 
 CPPFLAGS = -std=c++11 -O2
 
@@ -55,7 +58,7 @@ clean:
 	$(RM) hts
 
 install:
-	cp bin/sc_demultiplex $INSTALL_PATH/bin/
-	cp bin/sc_gene_counting $INSTALL_PATH/bin/
-	cp bin/sc_trim_barcode $INSTALL_PATH/bin/
-	cp bin/sc_exon_mapping $INSTALL_PATH/bin/
+	$(INSTALL_PROGRAM) bin/sc_demultiplex $(prefix)/bin/sc_demultiplex
+	$(INSTALL_PROGRAM) bin/sc_gene_counting $(prefix)/bin/sc_gene_counting
+	$(INSTALL_PROGRAM) bin/sc_trim_barcode $(prefix)/bin/sc_trim_barcode
+	$(INSTALL_PROGRAM) bin/sc_exon_mapping $(prefix)/bin/sc_exon_mapping
