@@ -39,6 +39,8 @@ runtest:
 
 test: buildtest runtest
 
+buildhts: $(HTS_DIR)
+
 buildPipe: $(OBJS)
 	mkdir -p bin
 	$(CXX) -o bin/sc_demultiplex sc_demultiplex.cpp $(LIBS) $(OBJS) $(CPPFLAGS)

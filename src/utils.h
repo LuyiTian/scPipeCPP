@@ -6,12 +6,11 @@
 #include <sstream>
 #include <vector>
 #include "global_config.h"
+
 #ifndef UTILS_H
 #define UTILS_H
 
-
-
-// join two paths, add separater if p1 does not end with it.
+// join two paths, add separator if p1 does not end with it.
 std::string join_path(const std::string p1, const std::string p2);
 
 // calculate hamming distance of two strings A and B
@@ -19,7 +18,7 @@ std::string join_path(const std::string p1, const std::string p2);
 int hamming_distance(std::string A, std::string B);
 
 // since htslib does not validate file status we 
-// need to check ourselfs
+// need to check ourself
 // if file not exist throw an exception
 void check_file_exists (std::string name);
 
@@ -43,7 +42,6 @@ public:
     int overlap(int st2, int en2);
 
     friend bool operator < (const Interval &L, const Interval &R);
-
     friend bool operator > (const Interval &L, const Interval &R);
 };
 
