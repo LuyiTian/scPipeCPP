@@ -5,6 +5,8 @@ This is a fork of the C++ portion of the scPipe software from https://github.com
 
 This pipeline provides tools for summarising gene counts from single or paired end reads containing unique molecular identifiers (UMI). Gene counting takes into account the UMI such that genes are only counted once per UMI for each exon.
 
+**Currently this software only supports macOS and Linux.**
+
 ## Installation
 ```
 make
