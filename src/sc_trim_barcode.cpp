@@ -7,7 +7,7 @@ using std::string;
 
 int main(int argc, char* argv[]) {
     if (argc < 4) 
-    {
+    { // Insufficient parameters
         std::cout << "Usage: sc_trim_barcode \n" <<\
             "\t-O <outfile> the output bam file (required)\n"<<\
             "\t-R1 <read1_file> read 1(required)\n"<<\
@@ -26,21 +26,21 @@ int main(int argc, char* argv[]) {
         exit(0);
     } 
     else 
-    { // if we got enough parameters...
-    read_s s = {};
-    filter_s fl = {};
-    string fq1_fn, fq2_fn, bam_out;
-    s.id1_st = 0;
-    s.id1_len = 8;
-    s.id2_st = 6;
-    s.id2_len = 8;
-    s.umi_st = 0;
-    s.umi_len = 6;
+    {
+        read_s s = {};
+        filter_s fl = {};
+        string fq1_fn, fq2_fn, bam_out;
+        s.id1_st = 0;
+        s.id1_len = 8;
+        s.id2_st = 6;
+        s.id2_len = 8;
+        s.umi_st = 0;
+        s.umi_len = 6;
 
-    fl.if_check_qual = false;
-    fl.if_remove_N = false;
-    fl.min_qual = 30;
-    fl.num_below_min = 1;
+        fl.if_check_qual = false;
+        fl.if_remove_N = false;
+        fl.min_qual = 30;
+        fl.num_below_min = 1;
         for (int i = 1; i < argc; i++) 
         {
             string arg = argv[i];
