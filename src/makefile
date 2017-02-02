@@ -12,13 +12,14 @@ INSTALL = install -p
 INSTALL_PROGRAM = $(INSTALL)
 
 CPPFLAGS = -std=c++11 -O2
+DEVEL_FLAGS = -std=c++11 -O2 -Wall -Wno-unused-function
 
 LIBS = -I$(HTS_DIR)/include -L$(HTS_DIR)/lib -Wl,-rpath,$(HTS_DIR)/lib -lhts -lz
 
 OBJS = utils.o cellbarcode.o parsebam.o parsecount.o trimbarcode.o transcriptmapping.o
 RM = rm -rf
 
-.PHONY: all buildhts buildtest runtest test buildPipe install
+.PHONY: all buildhts buildtest runtest test buildPipe install devel
 
 %.o: %.cpp $(HTS_DIR)
 	$(CXX) -c $(CPPFLAGS) $(LIBS) -o $@ $<
@@ -50,6 +51,13 @@ buildPipe: $(OBJS)
 	$(CXX) -o bin/sc_gene_counting sc_gene_counting.cpp $(LIBS) $(OBJS) $(CPPFLAGS)
 	$(CXX) -o bin/sc_trim_barcode sc_trim_barcode.cpp $(LIBS) $(OBJS) $(CPPFLAGS)
 	$(CXX) -o bin/sc_exon_mapping sc_exon_mapping.cpp $(LIBS) $(OBJS) $(CPPFLAGS)
+
+devel: $(OBJS)
+	mkdir -p bin
+	$(CXX) -o bin/sc_demultiplex sc_demultiplex.cpp $(LIBS) $(OBJS) $(DEVEL_FLAGS)
+	$(CXX) -o bin/sc_gene_counting sc_gene_counting.cpp $(LIBS) $(OBJS) $(DEVEL_FLAGS)
+	$(CXX) -o bin/sc_trim_barcode sc_trim_barcode.cpp $(LIBS) $(OBJS) $(DEVEL_FLAGS)
+	$(CXX) -o bin/sc_exon_mapping sc_exon_mapping.cpp $(LIBS) $(OBJS) $(DEVEL_FLAGS)
 
 clean:
 	$(RM) $(OBJS)
