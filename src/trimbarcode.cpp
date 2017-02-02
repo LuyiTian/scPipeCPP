@@ -157,8 +157,8 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
     kseq_t *seq2;
     seq2 = kseq_init(fq2);
 
-    // main loop, iterate through each fastq records
-    // ideally there should be equal number of reads in fq1 and fq2. we dont check this.
+    // main loop, iterate through each fastq record
+    // assume there are the name number of reads in read1 and read2 files, not checked.
     while (((l1 = kseq_read(seq1)) >= 0) && ((l2 = kseq_read(seq2)) >= 0))
     {  
         // qual check before we do anything
