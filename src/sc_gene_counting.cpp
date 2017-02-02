@@ -7,7 +7,7 @@
 
 int main(int argc, char* argv[]) {
     if (argc < 4) 
-    {
+    { // Insufficient parameters
         std::cout << "Usage: sc_demultiplex \n" <<\
             "\t-O <outdir> the output dir (required)\n"<<\
             "\t-A <barcode_annotation_file> annotate barcode and cell_id, \n for Drop-seq data you should run `./sc_detect_bc` to get the annotation file (required)\n"<<\
@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
         exit(0);
     } 
     else 
-    { // if we got enough parameters...
+    {
         std::string out_dir, annofn;
         int UMI_correction = 1;
         bool gene_filter = false;

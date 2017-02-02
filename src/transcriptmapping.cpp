@@ -126,7 +126,7 @@ std::string GeneAnnotation::get_parent(std::string tok)
 {
     std::string parent = "";
     auto subtoken = split(tok, ';');
-    for(auto attr : subtoken)
+    for (auto attr : subtoken)
     {
         if (attr.substr(0,6) == "Parent")
         {
@@ -141,7 +141,7 @@ std::string GeneAnnotation::get_ID(std::string tok)
 {
     std::string ID = "";
     auto subtoken = split(tok, ';');
-    for(auto attr : subtoken)
+    for (auto attr : subtoken)
     {
         if (attr.substr(0,2) == "ID")
         {
@@ -295,11 +295,11 @@ void GeneAnnotation::parse_bed_annotation(std::string bed_fn, bool fix_chrname)
 std::ostream& operator<< (std::ostream& out, const GeneAnnotation& obj)
 {
     out << "annotation statistics:" << std::endl;
-    for( const auto& n : obj.gene_dict ) 
+    for ( const auto& n : obj.gene_dict ) 
     {
         out << "\tchromosome:[" << n.first << "] number of genes:[" << n.second.size() << "]\n";
     }
-    for( const auto& n : obj.gene_dict ) 
+    for ( const auto& n : obj.gene_dict ) 
     {
         out << "first gene in chromosome " << n.first << " :" << std::endl;
         out << n.second[0] << std::endl;
@@ -312,7 +312,7 @@ std::ostream& operator<< (std::ostream& out, const GeneAnnotation& obj)
 
 void Mapping::add_annotation(std::string gff3_fn, bool fix_chrname)
 {
-    if(gff3_fn.substr(gff3_fn.find_last_of(".") + 1) == "gff3") 
+    if (gff3_fn.substr(gff3_fn.find_last_of(".") + 1) == "gff3") 
     {
         std::cout << "add gff3 annotation: " << gff3_fn << std::endl;
         Anno.parse_gff3_annotation(gff3_fn, fix_chrname);
@@ -355,7 +355,7 @@ int Mapping::map_exon(bam_hdr_t *header, bam1_t *b, std::string& gene_id, bool m
                 tmp_id = "";
                 for (auto i = iter.first; i < iter.second; ++i)
                 {
-                    if(i->in_exon(it, m_strand))
+                    if (i->in_exon(it, m_strand))
                     {
                         if (tmp_id != "")
                         {

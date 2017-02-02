@@ -4,7 +4,8 @@
 
 
 int main(int argc, char* argv[]) {
-    if (argc < 6) {
+    if (argc < 6) 
+    { // Insufficient parameters
         std::cout << "Usage: sc_demultiplex \n" <<\
             "\t-I <infile> the input bam file (required)\n"<<\
             "\t-O <outdir> the output dir (required)\n"<<\
@@ -18,7 +19,7 @@ int main(int argc, char* argv[]) {
         exit(0);
     } 
     else 
-    { // if we got enough parameters...
+    {
         std::string bamfn, out_dir, annofn;
         std::string bc = "YC";
         std::string mb = "YM";

@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[]) {
     if (argc < 4) 
-    {
+    { // Insufficient parameters
         std::cout << "Usage: sc_exon_mapping \n" <<\
             "\t-O <outbam> the output bam file (required)\n"<<\
             "\t-I <inbam> aligned bam file (required)\n"<<\
@@ -21,8 +21,8 @@ int main(int argc, char* argv[]) {
         exit(0);
     } 
     else 
-    { // if we got enough parameters...
-        std::string anno_fns, fn, fn_out, am, ge, bc, mb;
+    {
+        std::string anno_files, fn, fn_out, am, ge, bc, mb;
         bc = "YC";
         mb = "YM";
         ge = "GE";
@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
                 }
                 else if (arg == "-A") 
                 {
-                    anno_fns = argv[i + 1];
+                    anno_files = argv[i + 1];
                 }
                 else if (arg == "-AM")
                 {
@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        std::vector<std::string> token = split(anno_fns, ',');
+        std::vector<std::string> token = split(anno_files, ',');
 
         std::cout << "######### transcriptome mapping:" << std::endl;
         std::cout << "parameters:" << std::endl;
@@ -105,11 +105,11 @@ int main(int argc, char* argv[]) {
         
         if (UMI_len<0 || bc_len<0)
         {
-            std::cout << "ERROR: UMI length and barcode length must be sprcified." << std::endl;
+            std::cout << "ERROR: UMI length and barcode length must be specified." << std::endl;
             exit(1);
         }
         Mapping a = Mapping();
-        for( const auto& n : token) 
+        for (const auto& n : token) 
         {
             a.add_annotation(n, fix_chr);
         }
