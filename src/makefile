@@ -24,11 +24,11 @@ all: buildPipe
 
 $(HTS_DIR):
 	mkdir -p $(HTS_DIR) &&\
-	cd htslib-1.3 && \
-	make clean && \
-	./configure --disable-libcurl --prefix=$(HTS_DIR) CC=$(CC) CXX=$(CXX) && \
-	make && \
-	make install && \
+	cd htslib-1.3 &&\
+	make clean &&\
+	./configure --disable-libcurl --prefix=$(HTS_DIR) CC=$(CC) CXX=$(CXX) &&\
+	make &&\
+	$(RM) bin &&\
 	cd ..
 
 buildtest: $(OBJS)
