@@ -11,8 +11,8 @@ prefix ?= /usr/local
 INSTALL = install -p
 INSTALL_PROGRAM = $(INSTALL)
 
-CPPFLAGS = -std=c++11 -O2
-DEVEL_FLAGS = -std=c++11 -O2 -Wall -Wno-unused-function
+CPPFLAGS = -std=c++11 -static-libstdc++ -O2
+DEVEL_FLAGS = -std=c++11 -static-libstdc++ -O2 -Wall -Wno-unused-function
 
 LIBS = -I$(HTS_DIR)/include -L$(HTS_DIR)/lib -Wl,-rpath,$(HTS_DIR)/lib -lhts -lz
 
