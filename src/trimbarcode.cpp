@@ -230,7 +230,6 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
             std::cout << "return code: " << ret << std::endl;
             exit(EXIT_FAILURE);
         }
-        //dump_read(b);
         bam_destroy1(b);
     }
 
