@@ -22,5 +22,9 @@ This pipeline contains 4 programs:
 
 Run any of the programs with no arguments to see usage instructions.
 
+## Dependencies
+* [htslib](https://github.com/samtools/htslib) (Included with scPipe)
+* [zlib](https://github.com/madler/zlib) (Should be present on all modern macOS or Linux versions)
+
 ## Acknowledgements
 This package is inspired by `scater` and `scran` packages. Output from this pipeline can be converted to `SCESet` class in `scater` for downstream analysis.
