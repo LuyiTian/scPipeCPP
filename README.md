@@ -1,3 +1,5 @@
+[![Standard](https://img.shields.io/badge/c%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
+
 # scPipe
 This is a fork of the C++ portion of the scPipe software from https://github.com/LuyiTian/scPipe
 
