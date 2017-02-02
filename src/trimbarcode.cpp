@@ -1,6 +1,35 @@
 //trim_barcode
 #include "trimbarcode.h"
 
+// Local access only functions
+namespace {
+    bool check_qual(char *qual_s, int trim_n, int thr, int below_thr)
+    {
+        int not_pass = 0;
+        for (int i = 0; i < trim_n; i++)
+        {
+            if ((int)qual_s[i] <= thr){
+                not_pass++;
+            }
+        }
+        return not_pass>below_thr?false:true;
+    }
+
+    bool N_check(char *seq, int trim_n){
+        bool pass = true;
+        char *ptr = strchr(seq, 'N');
+        if (ptr)
+        {
+            int index = ptr - seq;
+            if (index <= trim_n)
+            {
+                pass = false;
+            }
+        }
+        return pass;
+    }
+}
+
 void kseq_t_to_bam_t(kseq_t *seq, bam1_t *b, int trim_n)
 {
     int seq_l = seq->seq.l - trim_n; // seq length after trim the barcode
@@ -36,42 +65,9 @@ void kseq_t_to_bam_t(kseq_t *seq, bam1_t *b, int trim_n)
     }
 }
 
-static bool check_qual(char *qual_s, int trim_n, int thr, int below_thr)
-{
-    int not_pass = 0;
-    for (int i = 0; i < trim_n; i++)
-    {
-        if ((int)qual_s[i] <= thr){
-            not_pass++;
-        }
-    }
-    return not_pass>below_thr?false:true;
-}
-
-static bool N_check(char *seq, int trim_n){
-    bool pass = true;
-    char *ptr = strchr(seq, 'N');
-    if (ptr)
-    {
-        int index = ptr - seq;
-        if (index <= trim_n)
-        {
-            pass = false;
-        }
-    }
-    return pass;
-}
-
 void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s read_structure, const filter_s filter_settings)
 {
-    // Filter tallies
-    int passed_reads = 0;
-    int removed_have_N = 0;
-    int removed_low_qual = 0;
-
-    int l1 = 0;
-    int l2 = 0;
-
+    // open files
     gzFile fq1 = gzopen(fq1_fn, "r"); // input fastq
     if (!fq1){fprintf(stderr, "cant open file: %s\n", fq1_fn); exit(EXIT_FAILURE);}
     gzFile fq2 = gzopen(fq2_fn, "r");
@@ -86,7 +82,7 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
     hdr->n_targets = 0;
     sam_hdr_write(fp, hdr);
 
-    // extract settings
+    // get settings
     int id1_st = read_structure.id1_st;
     int id1_len = read_structure.id1_len;
     int id2_st = read_structure.id2_st;
@@ -97,6 +93,7 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
     int bc1_end, bc2_end; // get total length of index + UMI for read1 and read2
     int state; // 0 for two index with umi, 1 for two index without umi, 2 for one index with umi, 3 for one index without umi
 
+    // naming states
     const int TWO_INDEX_WITH_UMI = 0;
     const int TWO_INDEX_NO_UMI = 1;
     const int ONE_INDEX_WITH_UMI = 2;
@@ -157,6 +154,13 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
     kseq_t *seq2;
     seq2 = kseq_init(fq2);
 
+    // filter tallies
+    int passed_reads = 0;
+    int removed_have_N = 0;
+    int removed_low_qual = 0;
+
+    int l1 = 0;
+    int l2 = 0;
     // main loop, iterate through each fastq record
     // assume there are the name number of reads in read1 and read2 files, not checked.
     while (((l1 = kseq_read(seq1)) >= 0) && ((l2 = kseq_read(seq2)) >= 0))
@@ -164,7 +168,8 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
         // qual check before we do anything
         if (filter_settings.if_check_qual)
         {
-            if(!(check_qual(seq1->seq.s, bc1_end, filter_settings.min_qual, filter_settings.num_below_min) && check_qual(seq2->seq.s, bc2_end, filter_settings.min_qual, filter_settings.num_below_min)))
+            if(!(check_qual(seq1->seq.s, bc1_end, filter_settings.min_qual, filter_settings.num_below_min) && 
+                 check_qual(seq2->seq.s, bc2_end, filter_settings.min_qual, filter_settings.num_below_min)))
             {
                 removed_low_qual++;
                 continue;
