@@ -3,10 +3,11 @@
 #include <iostream>
 #include "trimbarcode.h"
 
+using std::string;
 
 int main(int argc, char* argv[]) {
     if (argc < 4) 
-    {
+    { // Insufficient parameters
         std::cout << "Usage: sc_trim_barcode \n" <<\
             "\t-O <outfile> the output bam file (required)\n"<<\
             "\t-R1 <read1_file> read 1(required)\n"<<\
@@ -25,24 +26,24 @@ int main(int argc, char* argv[]) {
         exit(0);
     } 
     else 
-    { // if we got enough parameters...
-    read_s s = {};
-    filter_s fl = {};
-    std::string fq1_fn, fq2_fn, bam_out;
-    s.id1_st = 0;
-    s.id1_len = 8;
-    s.id2_st = 6;
-    s.id2_len = 8;
-    s.umi_st = 0;
-    s.umi_len = 6;
+    {
+        read_s s = {};
+        filter_s fl = {};
+        string fq1_fn, fq2_fn, bam_out;
+        s.id1_st = 0;
+        s.id1_len = 8;
+        s.id2_st = 6;
+        s.id2_len = 8;
+        s.umi_st = 0;
+        s.umi_len = 6;
 
-    fl.if_check_qual = false;
-    fl.if_remove_N = false;
-    fl.min_qual = 30;
-    fl.num_below_min = 1;
+        fl.if_check_qual = false;
+        fl.if_remove_N = false;
+        fl.min_qual = 30;
+        fl.num_below_min = 1;
         for (int i = 1; i < argc; i++) 
         {
-            std::string arg = argv[i];
+            string arg = argv[i];
 
             if (i + 1 != argc) 
             {
@@ -100,19 +101,22 @@ int main(int argc, char* argv[]) {
                 fl.if_remove_N = true;       
             }
         }
+
+        // Print options summary
         std::cout << "######### trim barcode:" << std::endl;
         std::cout << "parameters:" << std::endl;
-        std::cout << "\tout file: " << bam_out << std::endl;
-        std::cout << "\tread1 file: " << fq1_fn << std::endl;
-        std::cout << "\tread2 file: " << fq2_fn << std::endl;
-        std::cout << "\tindex one start / length: " << s.id1_st <<" / " <<s.id1_len<<std::endl;
-        std::cout << "\tindex two start / length: " << s.id2_st <<" / " <<s.id2_len<<std::endl;
-        std::cout << "\tUMI start / length: " << s.umi_st <<" / " << s.umi_len<<std::endl;
-        std::cout << "\tquality filter: " << fl.if_check_qual << std::endl;
-        std::cout << "\tremove reads with N: " << fl.if_remove_N << std::endl;
-        std::cout << "\tminimal quality: " << fl.min_qual << std::endl;
-        std::cout << "\tmaximium number of base below quality: " << fl.num_below_min << std::endl;
+        std::cout << "\t" << "output file: " << bam_out << std::endl;
+        std::cout << "\t" << "read1 file: " << fq1_fn << std::endl;
+        std::cout << "\t" << "read2 file: " << fq2_fn << std::endl;
+        std::cout << "\t" << "index one start / length: " << s.id1_st << " / " << s.id1_len << std::endl;
+        std::cout << "\t" << "index two start / length: " << s.id2_st << " / " << s.id2_len << std::endl;
+        std::cout << "\t" << "UMI start / length: " << s.umi_st << " / " << s.umi_len<<std::endl;
+        std::cout << "\t" << "quality filter: " << fl.if_check_qual << std::endl;
+        std::cout << "\t" << "remove reads with N: " << fl.if_remove_N << std::endl;
+        std::cout << "\t" << "minimal quality: " << fl.min_qual << std::endl;
+        std::cout << "\t" << "maximum number of below-quality bases: " << fl.num_below_min << std::endl;
 
+        // Print options summary
         paired_fastq_to_bam((char *)fq1_fn.c_str(), (char *)fq2_fn.c_str(), (char *)bam_out.c_str(), s, fl);
         return 0;
     }
