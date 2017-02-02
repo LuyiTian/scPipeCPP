@@ -7,6 +7,8 @@
         "*htypeinfo": "cpp",
         "*h*h*hnew": "cpp",
         "string": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "istream": "cpp",
+        "*tcc*tcc*tcc*tcc*h*h*h*h*h*h*h*h*h*h*h*h*h*hmemory": "cpp"
     }
 }
