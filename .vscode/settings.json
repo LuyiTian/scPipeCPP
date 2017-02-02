@@ -5,6 +5,8 @@
         "*htype_traits": "cpp",
         "*hexception": "cpp",
         "*htypeinfo": "cpp",
-        "*h*h*hnew": "cpp"
+        "*h*h*hnew": "cpp",
+        "string": "cpp",
+        "iostream": "cpp"
     }
 }
