@@ -13,16 +13,15 @@ KSEQ_INIT(gzFile, gzread)
 
 static const char empty_header[] = "@HD\tVN:1.4\tSO:unknown\n";
 
-// the read structure, gives information where we can find the barcode and UMI.
-// if there is no UMI, set umi_st = -1
+// Read structure
 struct read_s
 {
-    int id1_st;
-    int id1_len;
-    int id2_st;
-    int id2_len;
-    int umi_st;
-    int umi_len;
+    int id1_st;     // id1 start
+    int id1_len;    // id1 length
+    int id2_st;     // id2 start
+    int id2_len;    // id2 length
+    int umi_st;     // umi start
+    int umi_len;    // umi length
 };
 
 // Filter settings
@@ -34,7 +33,7 @@ struct filter_s
     int num_below_min;
 };
 
-// Convert 
+// Conversion functions
 void kseq_t_to_bam_t(kseq_t *seq, bam1_t *b, int trim_n);
 void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s r, const filter_s fl);
 #endif

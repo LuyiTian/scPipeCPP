@@ -36,8 +36,7 @@ void kseq_t_to_bam_t(kseq_t *seq, bam1_t *b, int trim_n)
     }
 }
 
-
-bool check_qual(char *qual_s, int trim_n, int thr, int below_thr)
+static bool check_qual(char *qual_s, int trim_n, int thr, int below_thr)
 {
     int not_pass = 0;
     for (int i = 0; i < trim_n; i++)
@@ -49,8 +48,7 @@ bool check_qual(char *qual_s, int trim_n, int thr, int below_thr)
     return not_pass>below_thr?false:true;
 }
 
-
-bool N_check(char *seq, int trim_n){
+static bool N_check(char *seq, int trim_n){
     bool pass = true;
     char *ptr = strchr(seq, 'N');
     if (ptr)
@@ -64,7 +62,7 @@ bool N_check(char *seq, int trim_n){
     return pass;
 }
 
-void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s read_settings, const filter_s filter_settings)
+void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s read_structure, const filter_s filter_settings)
 {
     // Filter tallies
     int passed_reads = 0;
@@ -89,12 +87,12 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
     sam_hdr_write(fp, hdr);
 
     // extract settings
-    int id1_st = read_settings.id1_st;
-    int id1_len = read_settings.id1_len;
-    int id2_st = read_settings.id2_st;
-    int id2_len = read_settings.id2_len;
-    int umi_st = read_settings.umi_st;
-    int umi_len = read_settings.umi_len;
+    int id1_st = read_structure.id1_st;
+    int id1_len = read_structure.id1_len;
+    int id2_st = read_structure.id2_st;
+    int id2_len = read_structure.id2_len;
+    int umi_st = read_structure.umi_st;
+    int umi_len = read_structure.umi_len;
 
     int bc1_end, bc2_end; // get total length of index + UMI for read1 and read2
     int state; // 0 for two index with umi, 1 for two index without umi, 2 for one index with umi, 3 for one index without umi
