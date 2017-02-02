@@ -36,5 +36,5 @@ struct filter_s
 
 // Convert 
 void kseq_t_to_bam_t(kseq_t *seq, bam1_t *b, int trim_n);
-void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, read_s r, filter_s fl);
+void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s r, const filter_s fl);
 #endif
