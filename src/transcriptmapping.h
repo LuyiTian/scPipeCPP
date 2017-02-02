@@ -14,7 +14,6 @@
 #ifndef TRANSCRIPTMAPPING_H
 #define TRANSCRIPTMAPPING_H
 
-
 // for position, we dont store chromosome info because we will put genes from the same chromosome
 // together in a hashmap
 class Gene: public Interval
