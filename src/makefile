@@ -8,7 +8,7 @@ DIR = $(shell pwd)
 HTS_DIR = $(DIR)/hts
 INSTALL_PATH ?= /usr/local
 
-CPPFLAGS = -std=c++11 -static-libstdc++ -O2
+CPPFLAGS = -std=c++11 -O2
 
 LIBS = -I$(HTS_DIR)/include -L$(HTS_DIR)/lib -Wl,-rpath,$(HTS_DIR)/lib -lhts -lz
 
