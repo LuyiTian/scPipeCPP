@@ -12,7 +12,7 @@ namespace {
                 not_pass++;
             }
         }
-        return not_pass>below_thr?false:true;
+        return (not_pass > below_thr) ? false : true;
     }
 
     bool N_check(char *seq, int trim_n){
@@ -21,7 +21,7 @@ namespace {
         if (ptr)
         {
             int index = ptr - seq;
-            if (index <= trim_n)
+            if (index < trim_n)
             {
                 pass = false;
             }
@@ -167,7 +167,7 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
     {  
         // qual check before we do anything
         if (filter_settings.if_check_qual)
-        {
+        { // Only check barcode/UMI quality
             if(!(check_qual(seq1->seq.s, bc1_end, filter_settings.min_qual, filter_settings.num_below_min) && 
                  check_qual(seq2->seq.s, bc2_end, filter_settings.min_qual, filter_settings.num_below_min)))
             {
@@ -226,6 +226,7 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
         seq1->name.l = name_offset + seq1->name.l;
 
         kseq_t_to_bam_t(seq1, b, bc1_end);
+        // write bam file
         int ret = sam_write1(fp, hdr, b);
         if (ret < 0)
         {
@@ -236,9 +237,12 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
         bam_destroy1(b);
     }
 
+    // cleanup
     kseq_destroy(seq1); kseq_destroy(seq2); // free seq 
     gzclose(fq1); gzclose(fq2); // close fastq file
     sam_close(fp); // close bam file
+
+    // print stats
     std::cout << "pass QC: " << passed_reads << std::endl;
     std::cout << "removed_have_N: " << removed_have_N << std::endl;
     std::cout << "removed_low_qual: " << removed_low_qual << std::endl;
