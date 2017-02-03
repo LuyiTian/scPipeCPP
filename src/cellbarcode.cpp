@@ -1,7 +1,6 @@
 // demultiplexing
 #include "cellbarcode.h"
 
-
 // read annotation from files, the file should have two columns
 // first column is cell id and second column is barcode.
 // protocols with two barcodes are merged as one.
@@ -41,7 +40,6 @@ void Barcode::read_anno(std::string fn)
     }
 }
 
-
 std::unordered_map<std::string, std::ofstream> Barcode::get_count_file_w(std::string out_dir)
 {
     std::string csv_fmt = ".csv";
@@ -64,7 +62,6 @@ std::unordered_map<std::string, std::ifstream> Barcode::get_count_file_r(std::st
     }
     return infn_dict;
 }
-
 
 std::string Barcode::get_closest_match(std::string bc_seq, int max_mismatch)
 {
@@ -104,8 +101,6 @@ std::string Barcode::get_closest_match(std::string bc_seq, int max_mismatch)
     }
 
 }
-
-
 
 std::ostream& operator<< (std::ostream& out, const Barcode& obj)
 {
