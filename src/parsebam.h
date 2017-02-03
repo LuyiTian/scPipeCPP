@@ -45,8 +45,6 @@ public:
     int barcode_demultiplex(std::string bam_path, int max_mismatch);
 
     void write_statistics(std::string overall_stat_f, std::string chr_stat_f, std::string cell_stat_f);
-
-    /* data */
 };
 
 #endif

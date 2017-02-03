@@ -2,7 +2,9 @@
 
 #include "parsebam.h"
 
-Bamdemultiplex::Bamdemultiplex(std::string odir, Barcode b, std::string cellular_tag, std::string molecular_tag, std::string gene_tag, std::string map_tag, std::string MT_tag)
+using std::string;
+
+Bamdemultiplex::Bamdemultiplex(string odir, Barcode b, string cellular_tag, string molecular_tag, string gene_tag, string map_tag, string MT_tag)
 {
     bar = b;
     c_tag = cellular_tag;
@@ -36,13 +38,14 @@ Bamdemultiplex::~Bamdemultiplex()
     // do sth
 }
 
-void Bamdemultiplex::write_statistics(std::string overall_stat_f, std::string chr_stat_f, std::string cell_stat_f)
+void Bamdemultiplex::write_statistics(string overall_stat_f, string chr_stat_f, string cell_stat_f)
 {
-    std::string stat_dir = join_path(out_dir, "stat");
+    string stat_dir = join_path(out_dir, "stat");
     std::ofstream overall_stat(join_path(stat_dir, overall_stat_f+".csv"));
     std::ofstream chr_stat(join_path(stat_dir, chr_stat_f+".csv"));
     std::ofstream cell_stat(join_path(stat_dir, cell_stat_f+".csv"));
     overall_stat << "status,count" << std::endl;
+
     for (const auto& n : overall_count_stat)
     {
         overall_stat << n.first << "," << n.second << std::endl;
@@ -67,12 +70,13 @@ void Bamdemultiplex::write_statistics(std::string overall_stat_f, std::string ch
     }
 }
 
-int Bamdemultiplex::barcode_demultiplex(std::string bam_path, int max_mismatch)
+int Bamdemultiplex::barcode_demultiplex(string bam_path, int max_mismatch)
 {
     check_file_exists(bam_path); // htslib does not check if file exist so we do it manually
     bam1_t *b = bam_init1();
     BGZF *fp = bgzf_open(bam_path.c_str(), "r");
     bam_hdr_t *header = bam_hdr_read(fp);
+
     int mt_idx = -1;
     for (int i = 0; i < header->n_targets; ++i)
     {
@@ -82,19 +86,23 @@ int Bamdemultiplex::barcode_demultiplex(std::string bam_path, int max_mismatch)
             mt_idx = i;
         }
     }
+
     if (mt_idx == -1)
     {
-        std::cout << "Warning: mitachondral chromosome not found using chromosome name `"<< mt_tag << "`.\n";
+        std::cout << "Warning: mitochondrial chromosome not found using chromosome name `"<< mt_tag << "`.\n";
     }
-    std::unordered_map<std::string, std::ofstream> outfn_dict = bar.get_count_file_w(join_path(out_dir, "count"));
+
+    std::unordered_map<string, std::ofstream> outfn_dict = bar.get_count_file_w(join_path(out_dir, "count"));
     const char * c_ptr = c_tag.c_str();
     const char * m_ptr = m_tag.c_str();
     const char * g_ptr = g_tag.c_str();
     const char * a_ptr = a_tag.c_str();
-    std::string bc_seq;
-    std::string match_res;
+
+    string bc_seq;
+    string match_res;
     int tmp_cnt = 0;
     int ret_code = 999999; // see `transcriptmapping.h` for different code
+
     while (bam_read1(fp, b) >= 0)
     {
         tmp_cnt++;
@@ -105,39 +113,39 @@ int Bamdemultiplex::barcode_demultiplex(std::string bam_path, int max_mismatch)
         {
             if (match_res.empty())
             {
-                overall_count_stat["barcode_unmatch_unaligned"] ++;
+                overall_count_stat["barcode_unmatch_unaligned"]++;
             }
             else
             {
-                overall_count_stat["barcode_match"] ++;
-                cell_unaligned[bar.barcode_dict[match_res]] ++;
+                overall_count_stat["barcode_match"]++;
+                cell_unaligned[bar.barcode_dict[match_res]]++;
             }
 
         }
         else
         {
-            chr_aligned_stat[header->target_name[b->core.tid]] ++;
+            chr_aligned_stat[header->target_name[b->core.tid]]++;
             if (bam_aux_get(b, g_ptr)) // found a gene; read mapped to transcriptome
             {
 
                 if (match_res.empty())
                 {
-                    overall_count_stat["barcode_unmatch_mapped_to_exon"] ++;
+                    overall_count_stat["barcode_unmatch_mapped_to_exon"]++;
                 }
                 else
                 {
-                    overall_count_stat["barcode_match"] ++;
+                    overall_count_stat["barcode_match"]++;
                     if (std::strncmp (header->target_name[b->core.tid],"ERCC",4) == 0)
                     {
-                        cell_ERCC[bar.barcode_dict[match_res]] ++;
+                        cell_ERCC[bar.barcode_dict[match_res]]++;
                     }
                     else
                     {
-                        cell_mapped_exon[bar.barcode_dict[match_res]] ++;
+                        cell_mapped_exon[bar.barcode_dict[match_res]]++;
                     }
                     if (b->core.tid == mt_idx)
                     {
-                        cell_MT[bar.barcode_dict[match_res]] ++;
+                        cell_MT[bar.barcode_dict[match_res]]++;
                     }
                     if (a_tag.empty())
                     {
@@ -169,47 +177,47 @@ int Bamdemultiplex::barcode_demultiplex(std::string bam_path, int max_mismatch)
                 {
                     if (a_tag.empty())
                     {
-                        overall_count_stat["barcode_unmatch_aligned"] ++;
+                        overall_count_stat["barcode_unmatch_aligned"]++;
                     }
                     else
                     {
                         tmp_cnt = std::atoi((char*)bam_aux_get(b, a_ptr)+1);
                         if (tmp_cnt == 1)
                         {
-                            overall_count_stat["barcode_unmatch_ambiguous_mapping"] ++;
+                            overall_count_stat["barcode_unmatch_ambiguous_mapping"]++;
                         }
                         else if (tmp_cnt == 2)
                         {
-                            overall_count_stat["barcode_unmatch_mapped_to_intron"] ++;
+                            overall_count_stat["barcode_unmatch_mapped_to_intron"]++;
                         }
                         else
                         {
-                            overall_count_stat["barcode_unmatch_aligned"] ++;
+                            overall_count_stat["barcode_unmatch_aligned"]++;
                         }
                     }
                     
                 }
                 else
                 {
-                    overall_count_stat["barcode_match"] ++;
+                    overall_count_stat["barcode_match"]++;
                     if (a_tag.empty())
                     {
-                        cell_align_unmapped[bar.barcode_dict[match_res]] ++;                    
+                        cell_align_unmapped[bar.barcode_dict[match_res]]++;                    
                     }
                     else
                     {
                         tmp_cnt = std::atoi((char*)bam_aux_get(b, a_ptr)+1);
                         if (tmp_cnt == 1)
                         {
-                            cell_mapped_ambiguous[bar.barcode_dict[match_res]] ++; 
+                            cell_mapped_ambiguous[bar.barcode_dict[match_res]]++; 
                         }
                         else if (tmp_cnt == 2)
                         {
-                            cell_mapped_intron[bar.barcode_dict[match_res]] ++; 
+                            cell_mapped_intron[bar.barcode_dict[match_res]]++; 
                         }
                         else
                         {
-                            cell_align_unmapped[bar.barcode_dict[match_res]] ++;  
+                            cell_align_unmapped[bar.barcode_dict[match_res]]++;  
                         }
                     }
 
