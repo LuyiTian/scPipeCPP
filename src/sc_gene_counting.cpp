@@ -7,7 +7,7 @@
 
 int main(int argc, char* argv[]) {
     if (argc < 4) 
-    { // Insufficient parameters
+    { 
         std::cout << "Usage: sc_demultiplex \n" <<\
             "\t-O <outdir> the output dir (required)\n"<<\
             "\t-A <barcode_annotation_file> annotate barcode and cell_id, \n for Drop-seq data you should run `./sc_detect_bc` to get the annotation file (required)\n"<<\
@@ -46,10 +46,10 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "######### molecular counting:" << std::endl;
         std::cout << "parameters:" << std::endl;
-        std::cout << "\tout dir: " << out_dir << std::endl;
-        std::cout << "\tannotation file: " << annofn << std::endl;
-        std::cout << "\tUMI_correction: " << UMI_correction << std::endl;
-        std::cout << "\tgene_filter " << gene_filter << std::endl;
+        std::cout << "\t" << "out dir: " << out_dir << std::endl;
+        std::cout << "\t" << "annotation file: " << annofn << std::endl;
+        std::cout << "\t" << "UMI_correction: " << UMI_correction << std::endl;
+        std::cout << "\t" << "gene_filter " << gene_filter << std::endl;
 
         Barcode bar;
         bar.read_anno(annofn);

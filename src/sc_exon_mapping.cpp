@@ -88,20 +88,20 @@ int main(int argc, char* argv[]) {
 
         std::cout << "######### transcriptome mapping:" << std::endl;
         std::cout << "parameters:" << std::endl;
-        std::cout << "\toutput bam file: " << fn_out << std::endl;
-        std::cout << "\taligned input bam file file: " << fn << std::endl;
+        std::cout << "\t" << "output bam file: " << fn_out << std::endl;
+        std::cout << "\t" << "aligned input bam file file: " << fn << std::endl;
         for( const auto& n : token) 
         {
-            std::cout << "\tannotation file: " << n << std::endl;
+            std::cout << "\t" << "annotation file: " << n << std::endl;
         }
-        std::cout << "\tmap status tag: " << am << std::endl;
-        std::cout << "\tgeneid tag: " << ge << std::endl;
-        std::cout << "\tcell barcode tag: " << bc << std::endl;
-        std::cout << "\tmolecular barcode tag: " << mb << std::endl;
-        std::cout << "\tbarcode length: " << bc_len << std::endl;
-        std::cout << "\tUMI_length: " << UMI_len << std::endl;
-        std::cout << "\tstrand_specific: " << std::boolalpha << m_strand << std::endl;
-        std::cout << "\tadd `chr` to chromosome names: " << std::boolalpha << fix_chr << std::endl;
+        std::cout << "\t" << "map status tag: " << am << std::endl;
+        std::cout << "\t" << "geneid tag: " << ge << std::endl;
+        std::cout << "\t" << "cell barcode tag: " << bc << std::endl;
+        std::cout << "\t" << "molecular barcode tag: " << mb << std::endl;
+        std::cout << "\t" << "barcode length: " << bc_len << std::endl;
+        std::cout << "\t" << "UMI_length: " << UMI_len << std::endl;
+        std::cout << "\t" << "strand_specific: " << std::boolalpha << m_strand << std::endl;
+        std::cout << "\t" << "add `chr` to chromosome names: " << std::boolalpha << fix_chr << std::endl;
         
         if (UMI_len<0 || bc_len<0)
         {

@@ -95,12 +95,12 @@ void Gene::sort_exon()
 std::ostream& operator<< (std::ostream& out, const Gene& obj)
 {
     out << "Gene ID:   " << obj.gene_id  << std::endl;
-    out << "\tstart/end:   " << obj.st  << "/" << obj.en << std::endl;
-    out << "\tstrand:   " << obj.snd  << std::endl;
-    out << "\tnumber of exons:   " << obj.exon_vec.size()  << std::endl;
+    out << "\t" << "start/end:   " << obj.st  << "/" << obj.en << std::endl;
+    out << "\t" << "strand:   " << obj.snd  << std::endl;
+    out << "\t" << "number of exons:   " << obj.exon_vec.size()  << std::endl;
     for (int i = 0; i < obj.exon_vec.size(); ++i)
     {
-        out << "\texon[" << i+1 << "]: (" << obj.exon_vec[i].st << ", " << obj.exon_vec[i].en << ")" << std::endl;
+        out << "\t" << "exon[" << i+1 << "]: (" << obj.exon_vec[i].st << ", " << obj.exon_vec[i].en << ")" << std::endl;
     }
     return out;
 }
@@ -291,7 +291,7 @@ std::ostream& operator<< (std::ostream& out, const GeneAnnotation& obj)
     out << "annotation statistics:" << std::endl;
     for ( const auto& n : obj.gene_dict ) 
     {
-        out << "\tchromosome:[" << n.first << "] number of genes:[" << n.second.size() << "]\n";
+        out << "\t" << "chromosome:[" << n.first << "] number of genes:[" << n.second.size() << "]\n";
     }
     for ( const auto& n : obj.gene_dict ) 
     {

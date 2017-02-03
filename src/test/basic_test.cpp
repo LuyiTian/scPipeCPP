@@ -25,7 +25,7 @@ void print_result(bool is_good, int &passed_test, int &failed_test){
 
 bool test_join_path()
 {
-    std::cout << "\ttest join_path() ...";
+    std::cout << "\t" << "test join_path() ...";
     std::string a = "aa/bb/cc";
     std::string b = "aa/bb/cc/";
     std::string c = "mm.csv";
@@ -35,7 +35,7 @@ bool test_join_path()
 
 bool test_hamming_distance()
 {
-    std::cout << "\ttest hamming_distance() ...";
+    std::cout << "\t" << "test hamming_distance() ...";
     std::string a = "ATCGTAAC";
     std::string b = "ATGCTAAC";
     int dist = hamming_distance(a,b);
@@ -45,7 +45,7 @@ bool test_hamming_distance()
 
 bool test_vector_counter()
 {
-    std::cout << "\ttest hamming_distance() ...";
+    std::cout << "\t" << "test hamming_distance() ...";
     std::vector<std::string> v = {"ATGCTAAC", "ATCTGCCC", "ATGCTAAC", "GTAGTAG"};
     std::unordered_map<std::string, int> tmp_res = vector_counter(v);
     return tmp_res["ATGCTAAC"] == 2;
@@ -54,7 +54,7 @@ bool test_vector_counter()
 
 bool test_overlap()
 {
-    std::cout << "\ttest Interval::overlap() ...";
+    std::cout << "\t" << "test Interval::overlap() ...";
     Interval a = Interval(500,700);
     Interval b = Interval(300,480);
     bool tmp = a.overlap(400,510) == 0 && \
@@ -67,7 +67,7 @@ bool test_overlap()
 
 bool test_read_anno()
 {
-    std::cout << "\ttest Barcode::read_anno() ...";
+    std::cout << "\t" << "test Barcode::read_anno() ...";
     Barcode bar;
     std::string fn = "test/test_data/barcode_anno.csv";
     bar.read_anno(fn);
@@ -81,7 +81,7 @@ bool test_read_anno()
 
 bool test_get_closest_match()
 {
-    std::cout << "\ttest Barcode::get_closest_match() ...";
+    std::cout << "\t" << "test Barcode::get_closest_match() ...";
     Barcode bar;
     std::string fn = "test/test_data/barcode_anno.csv";
     bar.read_anno(fn);
@@ -96,7 +96,7 @@ bool test_get_closest_match()
 
 bool test_barcode_demultiplex1()
 {
-    std::cout << "\ttest Bamdemultiplex::barcode_demultiplex() check_file_exists()...";
+    std::cout << "\t" << "test Bamdemultiplex::barcode_demultiplex() check_file_exists()...";
     //std::string bamfn = "/home/users/allstaff/tian.l/public_data/GSM1544799/GSM1544799_SpeciesMix_HundredSTAMPs.bam";
     //std::string annofn = "/home/users/allstaff/tian.l/public_data/GSM1544799/GSM1544799_smp_list.csv";
     std::string tmp_out = "/Users/luyi/Downloads/dropseq";
@@ -131,7 +131,7 @@ bool test_barcode_demultiplex1()
 
 bool test_barcode_demultiplex2()
 {
-    std::cout << "\ttest Bamdemultiplex::barcode_demultiplex() ...";
+    std::cout << "\t" << "test Bamdemultiplex::barcode_demultiplex() ...";
     //std::string tmp_out = "/home/users/allstaff/tian.l/public_data/GSM1544799/count";
     //std::string bamfn = "/home/users/allstaff/tian.l/public_data/GSM1544799/GSM1544799_SpeciesMix_HundredSTAMPs.bam";
     //std::string annofn = "/home/users/allstaff/tian.l/public_data/GSM1544799/GSM1544799_smp_list.csv";
@@ -156,7 +156,7 @@ bool test_barcode_demultiplex2()
 
 bool test_read_count()
 {
-    std::cout << "\ttest read_count() ...";
+    std::cout << "\t" << "test read_count() ...";
     char sep = ',';
     std::ifstream in_file("/Users/luyi/Downloads/dropseq/TCCGGGCTTAC.csv");
     std::unordered_map<std::string, std::vector<std::string>> tmp_res = read_count(in_file, sep);
@@ -167,7 +167,7 @@ bool test_read_count()
 
 bool test_UMI_correct1()
 {
-    std::cout << "\ttest UMI_correct1() ...";
+    std::cout << "\t" << "test UMI_correct1() ...";
     std::unordered_map<std::string, int> test_count;
     test_count["ATAATTA"] = 9;
     test_count["GTAGTAG"] = 6;
@@ -181,7 +181,7 @@ bool test_UMI_correct1()
 
 bool test_UMI_dedup()
 {
-    std::cout << "\ttest UMI_dedup() ...";
+    std::cout << "\t" << "test UMI_dedup() ...";
     std::vector<std::string> v = {"ATGCTAAC", "ATCTGCCC", "ATGCTAAC", "GTAGTAG"};
     std::vector<std::string> v1 = {"ATGCTAAC", "ATGCTAAT", "ATGCTAAC", "GTAGTAG"};
     std::unordered_map<std::string, std::vector<std::string>> gene_read;
@@ -203,7 +203,7 @@ bool test_UMI_dedup()
 
 bool test_get_counting_matrix()
 {
-    std::cout << "\ttest get_counting_matrix() ...";
+    std::cout << "\t" << "test get_counting_matrix() ...";
     std::string in_dir = "/Users/luyi/Downloads/dropseq";
     std::string annofn = "/Users/luyi/Downloads/anno_tmp.csv";
     Barcode bar;
@@ -217,7 +217,7 @@ bool test_get_counting_matrix()
 
 bool test_paired_fastq_to_bam()
 {
-    std::cout << "\ttest paired_fastq_to_bam() ...";
+    std::cout << "\t" << "test paired_fastq_to_bam() ...";
     read_s s = {};
     filter_s fl = {};
 
@@ -251,7 +251,7 @@ bool test_paired_fastq_to_bam()
 
 bool test_in_exon()
 {
-    std::cout << "\ttest Gene::in_exon() ...";
+    std::cout << "\t" << "test Gene::in_exon() ...";
     Gene a = Gene("GENE001", 100,900, 1);
     a.add_exon(Interval(100,200,0));
     a.add_exon(Interval(400,500,0));
@@ -263,7 +263,7 @@ bool test_in_exon()
 
 bool test_parse_annotation()
 {
-    std::cout << "\ttest GeneAnnotation::parse_annotation() ...";
+    std::cout << "\t" << "test GeneAnnotation::parse_annotation() ...";
     std::string fn = "/Users/luyi/Downloads/Mus_musculus.GRCm38.83.gff3";
     GeneAnnotation anno = GeneAnnotation();
     anno.parse_gff3_annotation(fn, false);
@@ -276,7 +276,7 @@ bool test_parse_annotation()
 
 bool test_parse_align()
 {
-    std::cout << "\ttest Mapping::parse_align() ...";
+    std::cout << "\t" << "test Mapping::parse_align() ...";
     std::string gff3_fn = "/Users/luyi/Downloads/Mus_musculus.GRCm38.83.gff3";
     //std::string fn = "/Users/luyi/Downloads/10.bam";
     //std::string fn_out = "/Users/luyi/Downloads/10_mapped.bam";
