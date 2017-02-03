@@ -416,7 +416,7 @@ int Mapping::map_exon(bam_hdr_t *header, bam1_t *b, string& gene_id, bool m_stra
 
 void Mapping::parse_align(string fn, string fn_out, bool m_strand, string map_tag, string gene_tag, string cellular_tag, string molecular_tag, int bc_len, int UMI_len)
 {
-    int unalign = 0;
+    int unaligned = 0;
     int ret;
     
     check_file_exists(fn); // htslib does not check if file exist so we do it manually
@@ -466,11 +466,11 @@ void Mapping::parse_align(string fn, string fn_out, bool m_strand, string map_ta
                 std::cout << "number of read processed:" << cnt << std::endl;
                 std::cout << tmp_c[0] <<"\t"<< tmp_c[1] <<"\t"<<tmp_c[2] <<"\t"<<tmp_c[3] <<"\t" << std::endl;
             }
-            cnt ++;   
+            cnt++;   
         }
         if ((b->core.flag&BAM_FUNMAP) > 0)
         {
-            unalign ++;
+            unaligned++;
             ret = 4;
         }
         else
@@ -522,7 +522,7 @@ void Mapping::parse_align(string fn, string fn_out, bool m_strand, string map_ta
     std::cout << "\t" << "ambiguous map to multiple exon:" << tmp_c[1] << std::endl;
     std::cout << "\t" << "map to intron:" << tmp_c[2] << std::endl;
     std::cout << "\t" << "not mapped:" << tmp_c[3] << std::endl;
-    std::cout << "\t" << "unaligned:" << unalign << std::endl;
+    std::cout << "\t" << "unaligned:" << unaligned << std::endl;
     sam_close(of);
     bgzf_close(fp);
 }

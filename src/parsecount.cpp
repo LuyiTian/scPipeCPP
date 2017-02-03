@@ -45,12 +45,12 @@ int UMI_correct1(std::unordered_map<std::string, int>& UMI_count)
         if (found)
         {
             // delete UMI1
-            corrected_UMI ++;
+            corrected_UMI++;
             UMI1 = UMI_count.erase(UMI1);
         }
         else
         {
-            UMI1 ++;
+            UMI1++;
         }
     }
     return corrected_UMI;
@@ -65,7 +65,7 @@ std::unordered_map<std::string, int> UMI_dedup(std::unordered_map<std::string, s
     {
         if (read_filter && a_gene.second.size() == 1)
         {
-            s.filtered_gene ++;
+            s.filtered_gene++;
             continue;
         }
 
@@ -176,7 +176,7 @@ void get_counting_matrix(Barcode bar, std::string in_dir, int UMI_correct, bool 
                 gene_cnt_matrix[ge.first][ind] = ge.second;
             }
         }
-        ind ++;
+        ind++;
     }
 
     // write to file
