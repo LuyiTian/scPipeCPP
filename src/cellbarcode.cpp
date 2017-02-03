@@ -33,14 +33,17 @@ void Barcode::read_anno(string fn)
         std::stringstream linestream(line);
         string cell_id;
         string barcode;
+
         std::getline(linestream, cell_id, sep);
         std::getline(linestream, barcode, sep);
 
         barcode_dict[barcode] = cell_id;
+
         if (std::find(cellid_list.begin(), cellid_list.end(), cell_id) == cellid_list.end())
         {
             cellid_list.push_back(cell_id);
         }
+        
         barcode_list.push_back(barcode);
     }
 }
