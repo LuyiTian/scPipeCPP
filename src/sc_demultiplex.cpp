@@ -2,7 +2,6 @@
 #include "parsebam.h"
 #include "cellbarcode.h"
 
-
 int main(int argc, char* argv[]) {
     if (argc < 6) 
     { // Insufficient parameters
@@ -13,14 +12,14 @@ int main(int argc, char* argv[]) {
             "\t-M <max_mismatch> maximum mismatch allowed when matching barcode (default: 1)\n"<<\
             "\t-GE <gene_tag> two characters gene tag used in bam file (default: `GE`)\n"<<\
             "\t-MB <molecular_tag> two characters UMI tag used in bam file (default: `XM`)\n"<<\
-            "\t-BC <cellular_tag> two characters cell barcode tag used in bam file (defalue: `XC`)\n"<<\
-            "\t-MP <cellular_tag> two characters mapping status tag used in bam file (defalue: `YE`)\n"<<\
-            "\t-MI <mitachondral_chromosome_name> should be consistant with the chromosome name in bam file.(defalue: `chrM`)\n"; 
+            "\t-BC <cellular_tag> two characters cell barcode tag used in bam file (default: `XC`)\n"<<\
+            "\t-MP <cellular_tag> two characters mapping status tag used in bam file (default: `YE`)\n"<<\
+            "\t-MI <mitochondrial_chromosome_name> should be consistant with the chromosome name in bam file.(default: `chrM`)\n"; 
         exit(0);
     } 
     else 
     {
-        std::string bamfn, out_dir, annofn;
+        std::string bam_fn, out_dir, anno_fn;
         std::string bc = "YC";
         std::string mb = "YM";
         std::string gb = "GE";
@@ -35,7 +34,7 @@ int main(int argc, char* argv[]) {
             {
                 if (arg == "-I") 
                 {
-                    bamfn = argv[i + 1];
+                    bam_fn = argv[i + 1];
                 } 
                 else if (arg == "-O") 
                 {
@@ -43,7 +42,7 @@ int main(int argc, char* argv[]) {
                 } 
                 else if (arg == "-A") 
                 {
-                    annofn = argv[i + 1];
+                    anno_fn = argv[i + 1];
                 }
                 else if (arg == "-M")
                 {
@@ -69,16 +68,16 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "######### demultiplexing:" << std::endl;
         std::cout << "parameters:" << std::endl;
-        std::cout << "\tbam file: " << bamfn << std::endl;
-        std::cout << "\tout dir: " << out_dir << std::endl;
-        std::cout << "\tannotation file: " << annofn << std::endl;
-        std::cout << "\tmax mismatch: " << max_mismatch << std::endl;
-        std::cout << "\tcell/molecular/gene tag: " << bc << "/"<< mb <<"/" << gb << std::endl;
+        std::cout << "\t" << "bam file: " << bam_fn << std::endl;
+        std::cout << "\t" << "out dir: " << out_dir << std::endl;
+        std::cout << "\t" << "annotation file: " << anno_fn << std::endl;
+        std::cout << "\t" << "max mismatch: " << max_mismatch << std::endl;
+        std::cout << "\t" << "cell/molecular/gene tag: " << bc << "/"<< mb <<"/" << gb << std::endl;
 
         Barcode bar;
-        bar.read_anno(annofn);
+        bar.read_anno(anno_fn);
         Bamdemultiplex bam_de = Bamdemultiplex(out_dir, bar, bc, mb, gb, am, mt);
-        bam_de.barcode_demultiplex(bamfn, max_mismatch);
+        bam_de.barcode_demultiplex(bam_fn, max_mismatch);
         bam_de.write_statistics("overall_stat", "chr_stat", "cell_stat");
         return 0;
     }
