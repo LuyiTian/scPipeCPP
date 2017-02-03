@@ -223,26 +223,3 @@ int Bamdemultiplex::barcode_demultiplex(std::string bam_path, int max_mismatch)
     bgzf_close(fp);
     return 0;
 }
-
-/*
-int main(int argc, char const *argv[])
-{
-    bam1_t *q = bam_init1();
-    BGZF *fp = bgzf_open("/Users/luyi/Downloads/star_gene_exon_tagged_clean.bam","r");
-    bam_hdr_t *header = bam_hdr_read(fp);
-    std::cout << header->target_name[20] << std::endl;
-    int ii = 0;
-    while (bam_read1(fp, q) >= 0 && ii <100){
-        printf("%d\t", q->core.flag&BAM_FMUNMAP);
-        printf("%s\t", bam_get_qname(q));
-        printf("%s\t", header->target_name[q->core.tid]);
-        printf("%d\t", q->core.pos);
-        if (bam_aux_get(q, "GE")){
-            printf(":::%s:::\n", bam_aux_get(q, "GE"));
-            ii++;
-        }
-    }
-    //printf("%s\n\n",  header->target_name[20]);
-    return 0;
-}
-*/
