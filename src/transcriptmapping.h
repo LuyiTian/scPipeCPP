@@ -84,7 +84,7 @@ public:
     void add_annotation(std::string gff3_fn, bool fix_chrname);
     // return:
     //  <=0 - unique map to exon, number indicate the distance to transcript end pos
-    //  1 - ambigious map to multiple exon
+    //  1 - ambiguous map to multiple exon
     //  2 - map to intron
     //  3 - unmapped
     //  4 - unaligned

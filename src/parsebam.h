@@ -15,7 +15,7 @@
 // per cell statistics:
 // cell_mapped: mapped to exon
 // cell_mapped_intron: mapped to intron
-// cell_mapped_ambigious: ambigious map to multiple exon
+// cell_mapped_ambiguous: ambiguous map to multiple exon
 // cell_align_unmapped: aligned to genome but not mapped to any feature
 // cell_unaligned: not aligned
 //
@@ -34,7 +34,7 @@ public:
     std::unordered_map<std::string, int> chr_aligned_stat;
     std::unordered_map<std::string, int> cell_mapped_exon;
     std::unordered_map<std::string, int> cell_mapped_intron;
-    std::unordered_map<std::string, int> cell_mapped_ambigious;
+    std::unordered_map<std::string, int> cell_mapped_ambiguous;
     std::unordered_map<std::string, int> cell_align_unmapped;
     std::unordered_map<std::string, int> cell_unaligned;
     std::unordered_map<std::string, int> cell_ERCC;

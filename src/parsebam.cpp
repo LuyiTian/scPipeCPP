@@ -16,7 +16,7 @@ Bamdemultiplex::Bamdemultiplex(std::string odir, Barcode b, std::string cellular
     {
         cell_mapped_exon[n] = 0;
         cell_mapped_intron[n] = 0;
-        cell_mapped_ambigious[n] = 0;
+        cell_mapped_ambiguous[n] = 0;
         cell_align_unmapped[n] = 0;
         cell_unaligned[n] = 0;
         cell_ERCC[n] = 0;
@@ -28,7 +28,7 @@ Bamdemultiplex::Bamdemultiplex(std::string odir, Barcode b, std::string cellular
     overall_count_stat["barcode_unmatch_aligned"] = 0;
     overall_count_stat["barcode_unmatch_mapped_to_exon"] = 0;
     overall_count_stat["barcode_unmatch_mapped_to_intron"] = 0;
-    overall_count_stat["barcode_unmatch_ambigious_mapping"] = 0;
+    overall_count_stat["barcode_unmatch_ambiguous_mapping"] = 0;
 }
 
 Bamdemultiplex::~Bamdemultiplex()
@@ -55,14 +55,14 @@ int Bamdemultiplex::write_statistics(std::string overall_stat_f, std::string chr
         chr_stat << n.first << "," << n.second << std::endl;
     }
 
-    cell_stat << "cell_id,unaligned,aligned_unmapped,mapped_to_exon,mapped_to_intron,ambigious_mapping,mapped_to_ERCC,mapped_to_MT" << std::endl;
+    cell_stat << "cell_id,unaligned,aligned_unmapped,mapped_to_exon,mapped_to_intron,ambiguous_mapping,mapped_to_ERCC,mapped_to_MT" << std::endl;
     for (const auto& n : bar.cellid_list)
     {
         cell_stat << n << "," << cell_unaligned[n] << "," << \
             cell_align_unmapped[n] << "," << \
             cell_mapped_exon[n] << "," << \
             cell_mapped_intron[n] << "," << \
-            cell_mapped_ambigious[n] << "," << \
+            cell_mapped_ambiguous[n] << "," << \
             cell_ERCC[n] << ","<< \
             cell_MT[n] << std::endl;
     }
@@ -162,7 +162,7 @@ int Bamdemultiplex::barcode_demultiplex(std::string bam_path, int max_mismatch)
             {
                 // return:
                 //  <=0 - unique map to exon, number indicate the distance to transcript end pos
-                //  1 - ambigious map to multiple exon
+                //  1 - ambiguous map to multiple exon
                 //  2 - map to intron
                 //  3 - unmapped
                 //  4 - unaligned
@@ -177,7 +177,7 @@ int Bamdemultiplex::barcode_demultiplex(std::string bam_path, int max_mismatch)
                         tmp_cnt = std::atoi((char*)bam_aux_get(b, a_ptr)+1);
                         if (tmp_cnt == 1)
                         {
-                            overall_count_stat["barcode_unmatch_ambigious_mapping"] ++;
+                            overall_count_stat["barcode_unmatch_ambiguous_mapping"] ++;
                         }
                         else if (tmp_cnt == 2)
                         {
@@ -202,7 +202,7 @@ int Bamdemultiplex::barcode_demultiplex(std::string bam_path, int max_mismatch)
                         tmp_cnt = std::atoi((char*)bam_aux_get(b, a_ptr)+1);
                         if (tmp_cnt == 1)
                         {
-                            cell_mapped_ambigious[bar.barcode_dict[match_res]] ++; 
+                            cell_mapped_ambiguous[bar.barcode_dict[match_res]] ++; 
                         }
                         else if (tmp_cnt == 2)
                         {
