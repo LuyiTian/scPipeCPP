@@ -1,20 +1,24 @@
 // demultiplexing
 #include "cellbarcode.h"
 
+using std::string;
+using std::unordered_map;
+
 // read annotation from files, the file should have two columns
 // first column is cell id and second column is barcode.
 // protocols with two barcodes are merged as one.
-void Barcode::read_anno(std::string fn)
+void Barcode::read_anno(string fn)
 {
     std::ifstream infile(fn);
-    std::string line;
+    string line;
     std::getline(infile, line); // skip header
+
     char sep;
-    if (std::string::npos != line.find(","))
+    if (line.find(",") != string::npos)
     {
         sep = ',';
     }
-    else if (line.find("\t") != std::string::npos)
+    else if (line.find("\t") != string::npos)
     {
         sep = '\t';
     }
@@ -26,8 +30,8 @@ void Barcode::read_anno(std::string fn)
     while(std::getline(infile, line))
     {
         std::stringstream linestream(line);
-        std::string cell_id;
-        std::string barcode;
+        string cell_id;
+        string barcode;
         std::getline(linestream, cell_id, sep);
         std::getline(linestream, barcode, sep);
 
@@ -40,22 +44,22 @@ void Barcode::read_anno(std::string fn)
     }
 }
 
-std::unordered_map<std::string, std::ofstream> Barcode::get_count_file_w(std::string out_dir)
+unordered_map<string, std::ofstream> Barcode::get_count_file_w(string out_dir)
 {
-    std::string csv_fmt = ".csv";
-    std::unordered_map<std::string, std::ofstream> outfn_dict;
+    string csv_fmt = ".csv";
+    unordered_map<string, std::ofstream> out_fn_dict;
     for(const auto& n : cellid_list) 
     {
-        outfn_dict[n].open(join_path(out_dir, n+csv_fmt));
-        outfn_dict[n] << "gene_id,UMI,position" << std::endl;
+        out_fn_dict[n].open(join_path(out_dir, n+csv_fmt));
+        out_fn_dict[n] << "gene_id,UMI,position" << std::endl;
     }
-    return outfn_dict;
+    return out_fn_dict;
 }
 
-std::unordered_map<std::string, std::ifstream> Barcode::get_count_file_r(std::string in_dir)
+unordered_map<string, std::ifstream> Barcode::get_count_file_r(string in_dir)
 {
-    std::string csv_fmt = ".csv";
-    std::unordered_map<std::string, std::ifstream> infn_dict;
+    string csv_fmt = ".csv";
+    unordered_map<string, std::ifstream> infn_dict;
     for(const auto& n : cellid_list) 
     {
         infn_dict[n].open(join_path(in_dir, n+csv_fmt));
@@ -63,7 +67,7 @@ std::unordered_map<std::string, std::ifstream> Barcode::get_count_file_r(std::st
     return infn_dict;
 }
 
-std::string Barcode::get_closest_match(std::string bc_seq, int max_mismatch)
+string Barcode::get_closest_match(string bc_seq, int max_mismatch)
 {
     if (barcode_dict.find(bc_seq) != barcode_dict.end())
     {
@@ -71,7 +75,7 @@ std::string Barcode::get_closest_match(std::string bc_seq, int max_mismatch)
     }
     int sml1st = 99999, sml2ed = 99999;
     int tmp;
-    std::string cloest_match;
+    string closest_match;
 
 
 
@@ -83,7 +87,7 @@ std::string Barcode::get_closest_match(std::string bc_seq, int max_mismatch)
             if (tmp < sml1st)
             {
                 sml1st = tmp;
-                cloest_match = barcode;
+                closest_match = barcode;
             }
             else if (sml1st < tmp <= sml2ed)
             {
@@ -93,11 +97,11 @@ std::string Barcode::get_closest_match(std::string bc_seq, int max_mismatch)
     }
     if (sml1st < sml2ed)
     {
-        return cloest_match;
+        return closest_match;
     }
     else
     {
-        return std::string();
+        return string();
     }
 
 }
