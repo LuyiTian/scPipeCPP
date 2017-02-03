@@ -95,12 +95,12 @@ void Gene::sort_exon()
 std::ostream& operator<< (std::ostream& out, const Gene& obj)
 {
     out << "Gene ID:   " << obj.gene_id  << std::endl;
-    out << "\t" << "start/end:   " << obj.st  << "/" << obj.en << std::endl;
-    out << "\t" << "strand:   " << obj.snd  << std::endl;
-    out << "\t" << "number of exons:   " << obj.exon_vec.size()  << std::endl;
+    out << "\tstart/end:   " << obj.st  << "/" << obj.en << std::endl;
+    out << "\tstrand:   " << obj.snd  << std::endl;
+    out << "\tnumber of exons:   " << obj.exon_vec.size()  << std::endl;
     for (int i = 0; i < obj.exon_vec.size(); ++i)
     {
-        out << "\t" << "exon[" << i+1 << "]: (" << obj.exon_vec[i].st << ", " << obj.exon_vec[i].en << ")" << std::endl;
+        out << "\texon[" << i+1 << "]: (" << obj.exon_vec[i].st << ", " << obj.exon_vec[i].en << ")" << std::endl;
     }
     return out;
 }
@@ -291,7 +291,7 @@ std::ostream& operator<< (std::ostream& out, const GeneAnnotation& obj)
     out << "annotation statistics:" << std::endl;
     for ( const auto& n : obj.gene_dict ) 
     {
-        out << "\t" << "chromosome:[" << n.first << "] number of genes:[" << n.second.size() << "]\n";
+        out << "\tchromosome:[" << n.first << "] number of genes:[" << n.second.size() << "]\n";
     }
     for ( const auto& n : obj.gene_dict ) 
     {
@@ -301,6 +301,7 @@ std::ostream& operator<< (std::ostream& out, const GeneAnnotation& obj)
     }
     return out;
 }
+
 
 void Mapping::add_annotation(string gff3_fn, bool fix_chrname)
 {
@@ -352,7 +353,7 @@ int Mapping::map_exon(bam_hdr_t *header, bam1_t *b, string& gene_id, bool m_stra
                         {
                             if (tmp_id != i->gene_id)
                             {
-                                tmp_ret = 1; // ambigious mapping
+                                tmp_ret = 1; // ambiguous mapping
                                 break;
                             }
                             else
@@ -384,7 +385,7 @@ int Mapping::map_exon(bam_hdr_t *header, bam1_t *b, string& gene_id, bool m_stra
             {
                 if (gene_id != "" && gene_id != tmp_id)
                 {
-                    ret = 1; // still ambigious
+                    ret = 1; // still ambiguous
                     break;
                 }
             }
@@ -501,7 +502,7 @@ void Mapping::parse_align(string fn, string fn_out, bool m_strand, string map_ta
         }
         if (UMI_len > 0)
         {
-            memcpy(buf, bam_get_qname(b)+bc_len+1, UMI_len*sizeof(char)); // `+1` to add seprarter
+            memcpy(buf, bam_get_qname(b)+bc_len+1, UMI_len*sizeof(char)); // `+1` to add separator
             buf[UMI_len] = '\0';
             bam_aux_append(b, m_ptr, 'Z', UMI_len+1, (uint8_t*)buf);
         }
@@ -518,10 +519,11 @@ void Mapping::parse_align(string fn, string fn_out, bool m_strand, string map_ta
     }
 
     std::cout << "\t" << "unique map to exon:" << tmp_c[0] << std::endl;
-    std::cout << "\t" << "ambigious map to multiple exon:" << tmp_c[1] << std::endl;
+    std::cout << "\t" << "ambiguous map to multiple exon:" << tmp_c[1] << std::endl;
     std::cout << "\t" << "map to intron:" << tmp_c[2] << std::endl;
     std::cout << "\t" << "not mapped:" << tmp_c[3] << std::endl;
     std::cout << "\t" << "unaligned:" << unalign << std::endl;
     sam_close(of);
     bgzf_close(fp);
 }
+
