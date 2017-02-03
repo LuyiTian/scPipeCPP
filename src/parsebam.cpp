@@ -36,8 +36,7 @@ Bamdemultiplex::~Bamdemultiplex()
     // do sth
 }
 
-
-int Bamdemultiplex::write_statistics(std::string overall_stat_f, std::string chr_stat_f, std::string cell_stat_f)
+void Bamdemultiplex::write_statistics(std::string overall_stat_f, std::string chr_stat_f, std::string cell_stat_f)
 {
     std::string stat_dir = join_path(out_dir, "stat");
     std::ofstream overall_stat(join_path(stat_dir, overall_stat_f+".csv"));

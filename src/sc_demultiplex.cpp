@@ -76,7 +76,9 @@ int main(int argc, char* argv[]) {
 
         Barcode bar;
         bar.read_anno(anno_fn);
+
         Bamdemultiplex bam_de = Bamdemultiplex(out_dir, bar, bc, mb, gb, am, mt);
+        
         bam_de.barcode_demultiplex(bam_fn, max_mismatch);
         bam_de.write_statistics("overall_stat", "chr_stat", "cell_stat");
         return 0;

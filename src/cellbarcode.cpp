@@ -27,6 +27,7 @@ void Barcode::read_anno(string fn)
         std::cout << "the annotation file should be comma or tab separated" << std::endl;
         exit(-1);
     }
+
     while(std::getline(infile, line))
     {
         std::stringstream linestream(line);
