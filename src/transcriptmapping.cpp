@@ -1,12 +1,14 @@
 // transcriptmapping.cpp
 #include "transcriptmapping.h"
 
+using std::string;
+using std::unordered_map;
 
-Gene::Gene(std::string id, int st, int en, int snd): Interval(st, en, snd), gene_id(id) {}
-Gene::Gene(std::string id, int snd): Interval(-1, -1, snd), gene_id(id) {}
+Gene::Gene(string id, int st, int en, int snd): Interval(st, en, snd), gene_id(id) {}
+Gene::Gene(string id, int snd): Interval(-1, -1, snd), gene_id(id) {}
 Gene::Gene(): Interval(-1, -1, 0), gene_id(""){}
 
-void Gene::set_ID(std::string id)
+void Gene::set_ID(string id)
 {
     gene_id = id;
 }
@@ -28,7 +30,6 @@ void Gene::add_exon(Interval it)
             snd = it.snd;
         }
 }
-
 
 int Gene::distance_to_end(Interval it)
 {
@@ -86,26 +87,23 @@ bool Gene::in_exon(Interval it, bool check_strand)
     }
 }
 
-
 void Gene::sort_exon()
 {
     std::sort(exon_vec.begin(), exon_vec.end());
 }
 
-
 std::ostream& operator<< (std::ostream& out, const Gene& obj)
 {
     out << "Gene ID:   " << obj.gene_id  << std::endl;
-    out << "\tstart/end:   " << obj.st  << "/" << obj.en << std::endl;
-    out << "\tstrand:   " << obj.snd  << std::endl;
-    out << "\tnumber of exons:   " << obj.exon_vec.size()  << std::endl;
+    out << "\t" << "start/end:   " << obj.st  << "/" << obj.en << std::endl;
+    out << "\t" << "strand:   " << obj.snd  << std::endl;
+    out << "\t" << "number of exons:   " << obj.exon_vec.size()  << std::endl;
     for (int i = 0; i < obj.exon_vec.size(); ++i)
     {
-        out << "\texon[" << i+1 << "]: (" << obj.exon_vec[i].st << ", " << obj.exon_vec[i].en << ")" << std::endl;
+        out << "\t" << "exon[" << i+1 << "]: (" << obj.exon_vec[i].st << ", " << obj.exon_vec[i].en << ")" << std::endl;
     }
     return out;
 }
-
 
 int GeneAnnotation::get_strand(char st)
 {
@@ -121,10 +119,9 @@ int GeneAnnotation::get_strand(char st)
     return strand;
 }
 
-
-std::string GeneAnnotation::get_parent(std::string tok)
+string GeneAnnotation::get_parent(string tok)
 {
-    std::string parent = "";
+    string parent = "";
     auto subtoken = split(tok, ';');
     for (auto attr : subtoken)
     {
@@ -136,10 +133,9 @@ std::string GeneAnnotation::get_parent(std::string tok)
     return parent;
 }
 
-
-std::string GeneAnnotation::get_ID(std::string tok)
+string GeneAnnotation::get_ID(string tok)
 {
-    std::string ID = "";
+    string ID = "";
     auto subtoken = split(tok, ';');
     for (auto attr : subtoken)
     {
@@ -151,10 +147,9 @@ std::string GeneAnnotation::get_ID(std::string tok)
     return ID;
 }
 
-
-std::string GeneAnnotation::fix_name(std::string na)
+string GeneAnnotation::fix_name(string na)
 {
-    std::string new_na;
+    string new_na;
     if (na.compare(0,3,"chr") == 0)
     {
         return na;
@@ -177,17 +172,17 @@ std::string GeneAnnotation::fix_name(std::string na)
     }
 }
 
-void GeneAnnotation::parse_gff3_annotation(std::string gff3_fn, bool fix_chrname)
+void GeneAnnotation::parse_gff3_annotation(string gff3_fn, bool fix_chrname)
 {
     std::ifstream infile(gff3_fn);
 
-    std::string line;
-    std::string ID;
-    std::string parent;
-    std::unordered_map<std::string, std::string> tmp_trans_dict; // store transcript - gene mapping
-    std::unordered_map<std::string, std::unordered_map<std::string, Gene>> tmp_gene_dict;
+    string line;
+    string ID;
+    string parent;
+    unordered_map<string, string> tmp_trans_dict; // store transcript - gene mapping
+    unordered_map<string, unordered_map<string, Gene>> tmp_gene_dict;
     int strand = 0;
-    std::vector<std::string> token;
+    std::vector<string> token;
 
     //std::cout << "build annotation from gff3 file..." << std::endl;
     while(std::getline(infile, line))
@@ -247,14 +242,14 @@ void GeneAnnotation::parse_gff3_annotation(std::string gff3_fn, bool fix_chrname
 
 }
 
-void GeneAnnotation::parse_bed_annotation(std::string bed_fn, bool fix_chrname)
+void GeneAnnotation::parse_bed_annotation(string bed_fn, bool fix_chrname)
 {
     std::ifstream infile(bed_fn);
 
-    std::string line;
-    std::unordered_map<std::string, std::unordered_map<std::string, Gene>> tmp_gene_dict;
+    string line;
+    unordered_map<string, unordered_map<string, Gene>> tmp_gene_dict;
     int strand = 0;
-    std::vector<std::string> token;
+    std::vector<string> token;
 
     std::getline(infile, line); // skip the header
     while(std::getline(infile, line))
@@ -291,13 +286,12 @@ void GeneAnnotation::parse_bed_annotation(std::string bed_fn, bool fix_chrname)
     }
 }
 
-
 std::ostream& operator<< (std::ostream& out, const GeneAnnotation& obj)
 {
     out << "annotation statistics:" << std::endl;
     for ( const auto& n : obj.gene_dict ) 
     {
-        out << "\tchromosome:[" << n.first << "] number of genes:[" << n.second.size() << "]\n";
+        out << "\t" << "chromosome:[" << n.first << "] number of genes:[" << n.second.size() << "]\n";
     }
     for ( const auto& n : obj.gene_dict ) 
     {
@@ -308,9 +302,7 @@ std::ostream& operator<< (std::ostream& out, const GeneAnnotation& obj)
     return out;
 }
 
-
-
-void Mapping::add_annotation(std::string gff3_fn, bool fix_chrname)
+void Mapping::add_annotation(string gff3_fn, bool fix_chrname)
 {
     if (gff3_fn.substr(gff3_fn.find_last_of(".") + 1) == "gff3") 
     {
@@ -325,8 +317,7 @@ void Mapping::add_annotation(std::string gff3_fn, bool fix_chrname)
     
 }
 
-
-int Mapping::map_exon(bam_hdr_t *header, bam1_t *b, std::string& gene_id, bool m_strand)
+int Mapping::map_exon(bam_hdr_t *header, bam1_t *b, string& gene_id, bool m_strand)
 {
     int ret = 9999;
     int rev = bam_is_rev(b)?(-1):1;
@@ -334,7 +325,7 @@ int Mapping::map_exon(bam_hdr_t *header, bam1_t *b, std::string& gene_id, bool m
     int tmp_pos = b->core.pos;
     int tmp_rest = 9999999; // distance to end pos
     int tmp_ret;
-    std::string tmp_id;
+    string tmp_id;
     gene_id = "";
 
     for (int c=0; c<b->core.n_cigar; c++)
@@ -422,17 +413,22 @@ int Mapping::map_exon(bam_hdr_t *header, bam1_t *b, std::string& gene_id, bool m
     }
 }
 
-void Mapping::parse_align(std::string fn, std::string fn_out, bool m_strand, std::string map_tag, std::string gene_tag, std::string cellular_tag, std::string molecular_tag, int bc_len, int UMI_len)
+void Mapping::parse_align(string fn, string fn_out, bool m_strand, string map_tag, string gene_tag, string cellular_tag, string molecular_tag, int bc_len, int UMI_len)
 {
     int unalign = 0;
     int ret;
+    
     check_file_exists(fn); // htslib does not check if file exist so we do it manually
+
+    // open files
     bam1_t *b = bam_init1();
-    BGZF *fp = bgzf_open(fn.c_str(), "r");
-    samFile *of = sam_open(fn_out.c_str(),"wb"); // output file
+    BGZF *fp = bgzf_open(fn.c_str(), "r"); // input file
+    samFile *of = sam_open(fn_out.c_str(), "wb"); // output file
+
     bam_hdr_t *header = bam_hdr_read(fp);
     sam_hdr_write(of, header);
-    std::string gene_id;
+
+    string gene_id;
     int tmp_c[4] = {0,0,0,0};
 
     bool found_any = false;
@@ -521,15 +517,11 @@ void Mapping::parse_align(std::string fn, std::string fn_out, bool m_strand, std
         }
     }
 
-    std::cout << "\tunique map to exon:" << tmp_c[0] << std::endl;
-    std::cout << "\tambigious map to multiple exon:" << tmp_c[1] << std::endl;
-    std::cout << "\tmap to intron:" << tmp_c[2] << std::endl;
-    std::cout << "\tnot mapped:" << tmp_c[3] << std::endl;
-    std::cout << "\tunaligned:" << unalign << std::endl;
+    std::cout << "\t" << "unique map to exon:" << tmp_c[0] << std::endl;
+    std::cout << "\t" << "ambigious map to multiple exon:" << tmp_c[1] << std::endl;
+    std::cout << "\t" << "map to intron:" << tmp_c[2] << std::endl;
+    std::cout << "\t" << "not mapped:" << tmp_c[3] << std::endl;
+    std::cout << "\t" << "unaligned:" << unalign << std::endl;
     sam_close(of);
     bgzf_close(fp);
 }
-
-
-
-
