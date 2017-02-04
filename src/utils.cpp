@@ -2,19 +2,9 @@
 
 using namespace std;
 
-string join_path(const string p1, const string p2)
-{
-   char sep = '/';
-   string tmp = p1;
-
-  if (p1[p1.length()-1] != sep) { // need to add a path separator
-    tmp += sep;                
-    return(tmp + p2);
-  }
-  else
-  {
-    return(p1 + p2);
-  }
+string join_path(const string p1, const string p2) {
+    auto sep = '/';
+	return p1.back() == sep ? p1 + p2 : p1 + sep + p2;
 }
 
 int hamming_distance(string A, string B)
