@@ -2,6 +2,8 @@
 #include "parsebam.h"
 #include "cellbarcode.h"
 
+using std::string;
+
 int main(int argc, char* argv[]) {
     if (argc < 6) 
     { // Insufficient parameters
@@ -19,16 +21,16 @@ int main(int argc, char* argv[]) {
     } 
     else 
     {
-        std::string bam_fn, out_dir, anno_fn;
-        std::string bc = "YC";
-        std::string mb = "YM";
-        std::string gb = "GE";
-        std::string am = "YE";
-        std::string mt = "chrM";
+        string bam_fn, out_dir, anno_fn;
+        string bc = "YC";
+        string mb = "YM";
+        string gb = "GE";
+        string am = "YE";
+        string mt = "chrM";
         int max_mismatch = 1;
         for (int i = 1; i < argc; i++) 
         {
-            std::string arg = argv[i];
+            string arg = argv[i];
 
             if (i + 1 != argc) 
             {
