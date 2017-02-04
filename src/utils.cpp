@@ -2,7 +2,8 @@
 
 using namespace std;
 
-string join_path(const string p1, const string p2) {
+string join_path(const string p1, const string p2)
+{
     auto sep = '/';
 	return p1.back() == sep ? p1 + p2 : p1 + sep + p2;
 }
