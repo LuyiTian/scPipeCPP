@@ -3,6 +3,8 @@
 #include "parsebam.h"
 
 using std::string;
+using std::unordered_map;
+using std::ofstream;
 
 Bamdemultiplex::Bamdemultiplex(string odir, Barcode b, string cellular_tag, string molecular_tag, string gene_tag, string map_tag, string MT_tag)
 {
@@ -36,9 +38,9 @@ Bamdemultiplex::Bamdemultiplex(string odir, Barcode b, string cellular_tag, stri
 void Bamdemultiplex::write_statistics(string overall_stat_f, string chr_stat_f, string cell_stat_f)
 {
     string stat_dir = join_path(out_dir, "stat");
-    std::ofstream overall_stat(join_path(stat_dir, overall_stat_f+".csv"));
-    std::ofstream chr_stat(join_path(stat_dir, chr_stat_f+".csv"));
-    std::ofstream cell_stat(join_path(stat_dir, cell_stat_f+".csv"));
+    ofstream overall_stat(join_path(stat_dir, overall_stat_f+".csv"));
+    ofstream chr_stat(join_path(stat_dir, chr_stat_f+".csv"));
+    ofstream cell_stat(join_path(stat_dir, cell_stat_f+".csv"));
     overall_stat << "status,count" << std::endl;
 
     for (const auto& n : overall_count_stat)
@@ -87,7 +89,9 @@ int Bamdemultiplex::barcode_demultiplex(string bam_path, int max_mismatch)
         std::cout << "Warning: mitochondrial chromosome not found using chromosome name `"<< mt_tag << "`.\n";
     }
 
-    std::unordered_map<string, std::ofstream> outfn_dict = bar.get_count_file_w(join_path(out_dir, "count"));
+    string output_dir = join_path(out_dir, "count");
+    unordered_map<string, ofstream> out_fn_dict = bar.get_count_file_w(output_dir);
+    
     const char * c_ptr = c_tag.c_str();
     const char * m_ptr = m_tag.c_str();
     const char * g_ptr = g_tag.c_str();
@@ -144,14 +148,14 @@ int Bamdemultiplex::barcode_demultiplex(string bam_path, int max_mismatch)
                     }
                     if (a_tag.empty())
                     {
-                        outfn_dict[bar.barcode_dict[match_res]] <<\
+                        out_fn_dict[bar.barcode_dict[match_res]] <<\
                          (bam_aux_get(b, g_ptr)+1) << "," <<\
                           (bam_aux_get(b, m_ptr)+1) << "," <<\
                            b->core.pos << std::endl;                        
                     }
                     else
                     {
-                        outfn_dict[bar.barcode_dict[match_res]] <<\
+                        out_fn_dict[bar.barcode_dict[match_res]] <<\
                          (bam_aux_get(b, g_ptr)+1) << "," <<\
                           (bam_aux_get(b, m_ptr)+1) << "," <<\
                            (-std::atoi((char*)bam_aux_get(b, a_ptr)+1)) << std::endl;                          
