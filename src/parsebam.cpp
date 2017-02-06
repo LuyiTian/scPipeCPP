@@ -38,9 +38,9 @@ Bamdemultiplex::Bamdemultiplex(string odir, Barcode b, string cellular_tag, stri
 void Bamdemultiplex::write_statistics(string overall_stat_f, string chr_stat_f, string cell_stat_f)
 {
     string stat_dir = join_path(out_dir, "stat");
-    ofstream overall_stat(join_path(stat_dir, overall_stat_f+".csv"));
-    ofstream chr_stat(join_path(stat_dir, chr_stat_f+".csv"));
-    ofstream cell_stat(join_path(stat_dir, cell_stat_f+".csv"));
+    ofstream overall_stat(join_path(stat_dir, overall_stat_f + ".csv"));
+    ofstream chr_stat(join_path(stat_dir, chr_stat_f + ".csv"));
+    ofstream cell_stat(join_path(stat_dir, cell_stat_f + ".csv"));
     overall_stat << "status,count" << std::endl;
 
     for (const auto& n : overall_count_stat)

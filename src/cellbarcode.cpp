@@ -67,6 +67,7 @@ unordered_map<string, std::ifstream> Barcode::get_count_file_r(string in_dir)
     for(const auto& n : cellid_list) 
     {
         infn_dict[n].open(join_path(in_dir, n+csv_fmt));
+        std::cout << "Reading: " << join_path(in_dir, n+csv_fmt) << std::endl;
     }
     return infn_dict;
 }

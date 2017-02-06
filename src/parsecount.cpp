@@ -11,7 +11,7 @@ unordered_map<string, std::vector<string>> read_count(std::ifstream& infile, cha
     std::getline(infile, line); // skip header
     while(std::getline(infile, line))
     {
-        stringstream linestream(line);
+        std::stringstream linestream(line);
         string gene_id;
         string UMI;
         std::getline(linestream, gene_id, sep);
