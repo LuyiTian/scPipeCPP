@@ -106,9 +106,11 @@ int Bamdemultiplex::barcode_demultiplex(string bam_path, int max_mismatch)
     {
         tmp_cnt++;
         //match barcode
-        bc_seq = (char*)(bam_aux_get(b, c_ptr)+1); // +1 to skip `Z`
+        bc_seq = (char*)(bam_aux_get(b, c_ptr) + 1); // +1 to skip `Z`
         match_res = bar.get_closest_match(bc_seq, max_mismatch);
-        if ((b->core.flag&BAM_FUNMAP) > 0)
+
+        bool is_unmapped = (b->core.flag & BAM_FUNMAP) > 0;
+        if (is_unmapped)
         {
             if (match_res.empty())
             {
@@ -219,13 +221,11 @@ int Bamdemultiplex::barcode_demultiplex(string bam_path, int max_mismatch)
                             cell_align_unmapped[bar.barcode_dict[match_res]]++;  
                         }
                     }
-
                 }
-                
             }
         }
-
     }
+
     bgzf_close(fp);
     return 0;
 }

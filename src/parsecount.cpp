@@ -1,17 +1,19 @@
 // parse count
 #include "parsecount.h"
 
+using std::string;
+using std::unordered_map;
 
-std::unordered_map<std::string, std::vector<std::string>> read_count(std::ifstream& infile, char sep)
+unordered_map<string, std::vector<string>> read_count(std::ifstream& infile, char sep)
 {
-    std::unordered_map<std::string, std::vector<std::string>> gene_read;
-    std::string line;
+    unordered_map<string, std::vector<string>> gene_read;
+    string line;
     std::getline(infile, line); // skip header
     while(std::getline(infile, line))
     {
-        std::stringstream linestream(line);
-        std::string gene_id;
-        std::string UMI;
+        stringstream linestream(line);
+        string gene_id;
+        string UMI;
         std::getline(linestream, gene_id, sep);
         std::getline(linestream, UMI, sep);
 
@@ -21,7 +23,7 @@ std::unordered_map<std::string, std::vector<std::string>> read_count(std::ifstre
     return gene_read;
 }
 
-int UMI_correct1(std::unordered_map<std::string, int>& UMI_count)
+int UMI_correct1(unordered_map<string, int>& UMI_count)
 {
     bool found = false;
     int corrected_UMI = 0;
@@ -56,10 +58,9 @@ int UMI_correct1(std::unordered_map<std::string, int>& UMI_count)
     return corrected_UMI;
 }
 
-
-std::unordered_map<std::string, int> UMI_dedup(std::unordered_map<std::string, std::vector<std::string>> gene_read, std::vector<int>& UMI_dup_count, UMI_dedup_stat& s, int UMI_correct, bool read_filter)
+unordered_map<string, int> UMI_dedup(unordered_map<string, std::vector<string>> gene_read, std::vector<int>& UMI_dup_count, UMI_dedup_stat& s, int UMI_correct, bool read_filter)
 {
-    std::unordered_map<std::string, int> gene_counter;
+    unordered_map<string, int> gene_counter;
 
     for(auto const& a_gene: gene_read)
     {
@@ -69,7 +70,7 @@ std::unordered_map<std::string, int> UMI_dedup(std::unordered_map<std::string, s
             continue;
         }
 
-        std::unordered_map<std::string, int> UMI_count = vector_counter(a_gene.second);
+        unordered_map<string, int> UMI_count = vector_counter(a_gene.second);
         if (UMI_correct == 1)
         {
             s.corrected_UMI += UMI_correct1(UMI_count);
@@ -101,8 +102,7 @@ std::unordered_map<std::string, int> UMI_dedup(std::unordered_map<std::string, s
     return gene_counter;
 }
 
-
-void write_mat(std::string fn, std::unordered_map<std::string, std::vector<int>> gene_cnt_matrix, std::vector<std::string> cellid_list)
+void write_mat(string fn, unordered_map<string, std::vector<int>> gene_cnt_matrix, std::vector<string> cellid_list)
 {
     std::ofstream o_file(fn);
     //write header
@@ -125,8 +125,7 @@ void write_mat(std::string fn, std::unordered_map<std::string, std::vector<int>>
     o_file.close();
 }
 
-
-void write_stat(std::string cnt_fn, std::string stat_fn, std::vector<int> UMI_dup_count, std::unordered_map<std::string, UMI_dedup_stat> UMI_dedup_stat_dict)
+void write_stat(string cnt_fn, string stat_fn, std::vector<int> UMI_dup_count, unordered_map<string, UMI_dedup_stat> UMI_dedup_stat_dict)
 {
     std::ofstream cnt_file(cnt_fn);
     cnt_file << "duplication number,count" << std::endl;
@@ -146,29 +145,28 @@ void write_stat(std::string cnt_fn, std::string stat_fn, std::vector<int> UMI_du
     stat_file.close();
 }
 
-
-void get_counting_matrix(Barcode bar, std::string in_dir, int UMI_correct, bool read_filter)
+void get_counting_matrix(Barcode bar, string in_dir, int UMI_correct, bool read_filter)
 {
     char sep = ',';
-    std::unordered_map<std::string, std::ifstream> cnt_files = bar.get_count_file_r(join_path(in_dir,"count"));
-    std::unordered_map<std::string, std::vector<int>> gene_cnt_matrix; // store gene counting matrix
-    std::vector<std::string> all_gene_list; //store all gene ids
+    unordered_map<string, std::ifstream> cnt_files = bar.get_count_file_r(join_path(in_dir, "count"));
+    unordered_map<string, std::vector<int>> gene_cnt_matrix; // store gene counting matrix
+    std::vector<string> all_gene_list; // store all gene ids
     std::vector<int> UMI_dup_count(MAX_UMI_DUP+1, 0); // store UMI duplication statistics
-    std::unordered_map<std::string, UMI_dedup_stat> UMI_dedup_stat_dict;
+    unordered_map<string, UMI_dedup_stat> UMI_dedup_stat_dict;
     int cell_number = bar.cellid_list.size();
     int ind = 0;
-    for (auto const& ce : bar.cellid_list) // for each cells
+    for (auto const& ce : bar.cellid_list) // for each cell
     {
-        UMI_dedup_stat_dict[ce] = {}; // init with all zero
-        std::unordered_map<std::string, std::vector<std::string>> gene_read = read_count(cnt_files[ce], sep);
-        std::unordered_map<std::string, int> gene_cnt =  UMI_dedup(gene_read, UMI_dup_count, UMI_dedup_stat_dict[ce], UMI_correct, read_filter);
+        UMI_dedup_stat_dict[ce] = {}; // init zero
+        unordered_map<string, std::vector<string>> gene_read = read_count(cnt_files[ce], sep);
+        unordered_map<string, int> gene_cnt =  UMI_dedup(gene_read, UMI_dup_count, UMI_dedup_stat_dict[ce], UMI_correct, read_filter);
 
-        for (auto const& ge : gene_cnt) // for each genes
+        for (auto const& ge : gene_cnt) // for each gene
         {
             if (gene_cnt_matrix.find(ge.first) == gene_cnt_matrix.end())
             {
                 auto & vec = gene_cnt_matrix[ge.first];
-                vec.resize(cell_number, 0); // init with all zero
+                vec.resize(cell_number, 0); // init with all zeros
                 vec[ind] = ge.second; 
             }
             else
@@ -181,7 +179,7 @@ void get_counting_matrix(Barcode bar, std::string in_dir, int UMI_correct, bool 
 
     // write to file
     write_mat(join_path(in_dir, "gene_count.csv"), gene_cnt_matrix, bar.cellid_list);
-    std::string stat_dir = join_path(in_dir, "stat");
+    string stat_dir = join_path(in_dir, "stat");
     write_stat(join_path(stat_dir, "UMI_duplication_count.csv"), join_path(stat_dir, "UMI_dedup_stat.csv"), UMI_dup_count, UMI_dedup_stat_dict);
 
 }
