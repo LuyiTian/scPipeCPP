@@ -47,8 +47,8 @@ int Gene::distance_to_end(Interval it)
                 distance += i->en - i->st;
                 tmp_en = i->en;
             }
-            
-        } 
+
+        }
 
     }
     else if (snd == -1)
@@ -60,7 +60,7 @@ int Gene::distance_to_end(Interval it)
                 distance += i->en - i->st;
                 tmp_en = i->en;
             }
-        } 
+        }
         if (tmp_en < iter->st)
         {
             distance += ((iter->en)<it.en?(iter->en):it.en) - iter->st;
@@ -158,7 +158,7 @@ string GeneAnnotation::fix_name(string na)
     {
         return na;
     }
-    else 
+    else
     {
         if (na == "MT")
         {
@@ -195,7 +195,7 @@ void GeneAnnotation::parse_gff3_annotation(string gff3_fn, bool fix_chrname)
         token = split(line, '\t');
         parent = get_parent(token[8]);
         strand = get_strand(token[6][0]);
-        if (token[2] == "exon") 
+        if (token[2] == "exon")
         {
             if (tmp_trans_dict.end() != tmp_trans_dict.find(parent))
             {
@@ -216,7 +216,7 @@ void GeneAnnotation::parse_gff3_annotation(string gff3_fn, bool fix_chrname)
                 std::cout << line << std::endl;
                 exit(EXIT_FAILURE);
             }
-            
+
         }
 
         else if (!parent.empty())
@@ -289,11 +289,11 @@ void GeneAnnotation::parse_bed_annotation(string bed_fn, bool fix_chrname)
 std::ostream& operator<< (std::ostream& out, const GeneAnnotation& obj)
 {
     out << "annotation statistics:" << std::endl;
-    for ( const auto& n : obj.gene_dict ) 
+    for ( const auto& n : obj.gene_dict )
     {
         out << "\t" << "chromosome:[" << n.first << "] number of genes:[" << n.second.size() << "]\n";
     }
-    for ( const auto& n : obj.gene_dict ) 
+    for ( const auto& n : obj.gene_dict )
     {
         out << "first gene in chromosome " << n.first << " :" << std::endl;
         out << n.second[0] << std::endl;
@@ -305,17 +305,17 @@ std::ostream& operator<< (std::ostream& out, const GeneAnnotation& obj)
 
 void Mapping::add_annotation(string gff3_fn, bool fix_chrname)
 {
-    if (gff3_fn.substr(gff3_fn.find_last_of(".") + 1) == "gff3") 
+    if (gff3_fn.substr(gff3_fn.find_last_of(".") + 1) == "gff3")
     {
         std::cout << "add gff3 annotation: " << gff3_fn << std::endl;
         Anno.parse_gff3_annotation(gff3_fn, fix_chrname);
-    } 
-    else 
+    }
+    else
     {
         Anno.parse_bed_annotation(gff3_fn, fix_chrname);
         std::cout << "add bed annotation: " << gff3_fn << std::endl;
     }
-    
+
 }
 
 int Mapping::map_exon(bam_hdr_t *header, bam1_t *b, string& gene_id, bool m_strand)
@@ -418,7 +418,7 @@ void Mapping::parse_align(string fn, string fn_out, bool m_strand, string map_ta
 {
     int unaligned = 0;
     int ret;
-    
+
     check_file_exists(fn); // htslib does not check if file exist so we do it manually
 
     // open files
@@ -433,6 +433,7 @@ void Mapping::parse_align(string fn, string fn_out, bool m_strand, string map_ta
     int tmp_c[4] = {0,0,0,0};
 
     bool found_any = false;
+    #pragma omp parallel for
     for (int i = 0; i < header->n_targets; ++i)
     {
         if (Anno.gene_dict.end() == Anno.gene_dict.find(header->target_name[i]))
@@ -466,7 +467,7 @@ void Mapping::parse_align(string fn, string fn_out, bool m_strand, string map_ta
                 std::cout << "number of read processed:" << cnt << std::endl;
                 std::cout << tmp_c[0] <<"\t"<< tmp_c[1] <<"\t"<<tmp_c[2] <<"\t"<<tmp_c[3] <<"\t" << std::endl;
             }
-            cnt++;   
+            cnt++;
         }
         if ((b->core.flag&BAM_FUNMAP) > 0)
         {
@@ -476,7 +477,7 @@ void Mapping::parse_align(string fn, string fn_out, bool m_strand, string map_ta
         else
         {
             //  chromosome not found in annotation:
-            if (Anno.gene_dict.end() == Anno.gene_dict.find(header->target_name[b->core.tid])) 
+            if (Anno.gene_dict.end() == Anno.gene_dict.find(header->target_name[b->core.tid]))
             {
                 ret = 3;
             }
@@ -496,13 +497,13 @@ void Mapping::parse_align(string fn, string fn_out, bool m_strand, string map_ta
         }
         if (bc_len > 0)
         {
-            memcpy(buf, bam_get_qname(b), bc_len*sizeof(char));
+            memcpy(buf, bam_get_qname(b), bc_len * sizeof(char));
             buf[bc_len] = '\0';
             bam_aux_append(b, c_ptr, 'Z', bc_len+1, (uint8_t*)buf);
         }
         if (UMI_len > 0)
         {
-            memcpy(buf, bam_get_qname(b)+bc_len+1, UMI_len*sizeof(char)); // `+1` to add separator
+            memcpy(buf, bam_get_qname(b)+bc_len+1, UMI_len * sizeof(char)); // `+1` to add separator
             buf[UMI_len] = '\0';
             bam_aux_append(b, m_ptr, 'Z', UMI_len+1, (uint8_t*)buf);
         }
