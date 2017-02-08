@@ -1,6 +1,8 @@
-[![Standard](https://img.shields.io/badge/c%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
+
 
 # scPipeCPP
+[![Standard](https://img.shields.io/badge/c%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
+
 This pipeline provides tools for summarising gene counts from single or paired end reads containing unique molecular identifiers (UMI). Gene counting takes into account the UMI such that genes are only counted once per UMI for each exon.
 
 **Currently this software only supports macOS and Linux.**
