@@ -5,65 +5,65 @@
 ################################################################
 
 DIR = $(shell pwd)
-HTS_DIR = $(DIR)/hts
 prefix ?= /usr/local
 
 INSTALL = install -p
 INSTALL_PROGRAM = $(INSTALL)
 
-CPPFLAGS = -std=c++11 -static-libstdc++ -O2
-DEVEL_FLAGS = -std=c++11 -static-libstdc++ -O2 -Wall -Wno-unused-function
+CPPFLAGS = -std=c++11 -O2
+DEVEL_FLAGS = -std=c++11 -O2 -Wall -Wno-unused-function
+CFLAGS = -O2
+LIBS = -lz
 
-LIBS = -I$(HTS_DIR)/include -L$(HTS_DIR)/lib -Wl,-rpath,$(HTS_DIR)/lib -lhts -lz
-
-OBJS = utils.o cellbarcode.o parsebam.o parsecount.o trimbarcode.o transcriptmapping.o
+HTS_OBJS = sam.hts.o bgzf.hts.o hfile.hts.o hts.hts.o kstring.hts.o
+OBJS = utils.o cellbarcode.o parsebam.o parsecount.o trimbarcode.o transcriptmapping.o fq_simulator.o
 RM = rm -rf
 
-.PHONY: all buildhts buildtest runtest test buildPipe install devel
+.PHONY: all clean buildtest runtest test buildPipe install devel
+.SUFFIXES: .o .hts.o
 
-%.o: %.cpp $(HTS_DIR)
+%.o: %.cpp
 	$(CXX) -c $(CPPFLAGS) $(LIBS) -o $@ $<
 
-all: buildPipe
+%.hts.o: hts_bam/%.c
+	$(CC) -c $(CFLAGS) -o $@ $<
 
-$(HTS_DIR):
-	mkdir -p $(HTS_DIR) &&\
-	cd htslib-1.3 &&\
-	make clean &&\
-	./configure --disable-libcurl --prefix=$(HTS_DIR) CC=$(CC) CXX=$(CXX) &&\
-	make &&\
-	$(RM) bin &&\
-	cd ..
+all: buildPipe buildtest
 
-buildtest: $(OBJS)
-	$(CXX) -o test/basic_test test/basic_test.cpp $(LIBS) $(OBJS) $(CPPFLAGS)
+buildtest:
+	$(CXX) -o test/test_simulator test/test_simulator.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
+	#$(CXX) -o test/basic_test test/basic_test.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
+
+testpipe:
+	cd test && chmod u+x ./test_celseq2_pipe.sh && ./test_celseq2_pipe.sh
 
 runtest:
-	./test/basic_test
+	cd test && ./test_simulator
+	#./test/basic_test
 
-test: buildtest runtest
+test: runtest
 
-buildhts: $(HTS_DIR)
-
-buildPipe: $(OBJS)
+buildPipe: $(HTS_OBJS) $(OBJS)
 	mkdir -p bin
-	$(CXX) -o bin/sc_demultiplex sc_demultiplex.cpp $(LIBS) $(OBJS) $(CPPFLAGS)
-	$(CXX) -o bin/sc_gene_counting sc_gene_counting.cpp $(LIBS) $(OBJS) $(CPPFLAGS)
-	$(CXX) -o bin/sc_trim_barcode sc_trim_barcode.cpp $(LIBS) $(OBJS) $(CPPFLAGS)
-	$(CXX) -o bin/sc_exon_mapping sc_exon_mapping.cpp $(LIBS) $(OBJS) $(CPPFLAGS)
+	$(CXX) -o bin/sc_demultiplex sc_demultiplex.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
+	$(CXX) -o bin/sc_gene_counting sc_gene_counting.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
+	$(CXX) -o bin/sc_trim_barcode sc_trim_barcode.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
+	$(CXX) -o bin/sc_exon_mapping sc_exon_mapping.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
 
-devel: $(OBJS)
+devel: $(HTS_OBJS) $(OBJS)
 	mkdir -p bin
-	$(CXX) -o bin/sc_demultiplex sc_demultiplex.cpp $(LIBS) $(OBJS) $(DEVEL_FLAGS)
-	$(CXX) -o bin/sc_gene_counting sc_gene_counting.cpp $(LIBS) $(OBJS) $(DEVEL_FLAGS)
-	$(CXX) -o bin/sc_trim_barcode sc_trim_barcode.cpp $(LIBS) $(OBJS) $(DEVEL_FLAGS)
-	$(CXX) -o bin/sc_exon_mapping sc_exon_mapping.cpp $(LIBS) $(OBJS) $(DEVEL_FLAGS)
+	$(CXX) -o bin/sc_demultiplex sc_demultiplex.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(DEVEL_FLAGS)
+	$(CXX) -o bin/sc_gene_counting sc_gene_counting.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(DEVEL_FLAGS)
+	$(CXX) -o bin/sc_trim_barcode sc_trim_barcode.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(DEVEL_FLAGS)
+	$(CXX) -o bin/sc_exon_mapping sc_exon_mapping.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(DEVEL_FLAGS)
 
 clean:
 	$(RM) $(OBJS)
+	$(RM) $(HTS_OBJS)
+	$(RM) bin/*
 	$(RM) test/basic_test
-	$(RM) ./bin
-	$(RM) hts
+	$(RM) test/test_simulator
+	$(RM) test/celseq2/*
 
 install:
 	$(INSTALL_PROGRAM) bin/sc_demultiplex $(prefix)/bin/sc_demultiplex

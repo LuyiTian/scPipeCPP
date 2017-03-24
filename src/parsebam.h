@@ -2,8 +2,7 @@
 #include <fstream>
 #include <cstring>
 #include <unordered_map>
-#include <htslib/sam.h>
-#include <htslib/bgzf.h>
+#include "config_hts.h"
 #include "utils.h"
 #include "cellbarcode.h"
 

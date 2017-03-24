@@ -9,7 +9,7 @@ int main(int argc, char* argv[]) {
     if (argc < 4) 
     { // Insufficient parameters
         std::cout << "Usage: sc_trim_barcode \n" <<\
-            "\t-O <outfile> the output bam file (required)\n"<<\
+            "\t-O <outfile> the output fastq file (required)\n"<<\
             "\t-R1 <read1_file> read 1(required)\n"<<\
             "\t-R2 <read2_file> read 2 for paired read (default: none)\n"<<\
             "\t-BS1 <id1_st> starting position of index in read one (default: 0)\n"<<\
@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
     {
         read_s s = {};
         filter_s fl = {};
-        string fq1_fn, fq2_fn, bam_out;
+        string fq1_fn, fq2_fn, fq_out;
         s.id1_st = 0;
         s.id1_len = 8;
         s.id2_st = 6;
@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
             {
                 if (arg == "-O") 
                 {
-                    bam_out = argv[i + 1];
+                    fq_out = argv[i + 1];
                 } 
                 else if (arg == "-R1") 
                 {
@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
         // Print options summary
         std::cout << "######### trim barcode:" << std::endl;
         std::cout << "parameters:" << std::endl;
-        std::cout << "\t" << "output file: " << bam_out << std::endl;
+        std::cout << "\t" << "output file: " << fq_out << std::endl;
         std::cout << "\t" << "read1 file: " << fq1_fn << std::endl;
         std::cout << "\t" << "read2 file: " << fq2_fn << std::endl;
         std::cout << "\t" << "index one start / length: " << s.id1_st << " / " << s.id1_len << std::endl;
@@ -117,7 +117,7 @@ int main(int argc, char* argv[]) {
         std::cout << "\t" << "maximum number of below-quality bases: " << fl.num_below_min << std::endl;
 
         // Print options summary
-        paired_fastq_to_bam((char *)fq1_fn.c_str(), (char *)fq2_fn.c_str(), (char *)bam_out.c_str(), s, fl);
+        paired_fastq_to_fastq((char *)fq1_fn.c_str(), (char *)fq2_fn.c_str(), (char *)fq_out.c_str(), s, fl);
         return 0;
     }
 }

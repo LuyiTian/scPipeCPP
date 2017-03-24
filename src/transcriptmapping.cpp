@@ -2,7 +2,6 @@
 #include "transcriptmapping.h"
 
 using std::string;
-using std::unordered_map;
 
 Gene::Gene(string id, int st, int en, int snd): Interval(st, en, snd), gene_id(id) {}
 Gene::Gene(string id, int snd): Interval(-1, -1, snd), gene_id(id) {}
@@ -179,8 +178,8 @@ void GeneAnnotation::parse_gff3_annotation(string gff3_fn, bool fix_chrname)
     string line;
     string ID;
     string parent;
-    unordered_map<string, string> tmp_trans_dict; // store transcript - gene mapping
-    unordered_map<string, unordered_map<string, Gene>> tmp_gene_dict;
+    std::unordered_map<string, string> tmp_trans_dict; // store transcript - gene mapping
+    std::unordered_map<string, std::unordered_map<string, Gene>> tmp_gene_dict;
     int strand = 0;
     std::vector<string> token;
 
@@ -247,7 +246,7 @@ void GeneAnnotation::parse_bed_annotation(string bed_fn, bool fix_chrname)
     std::ifstream infile(bed_fn);
 
     string line;
-    unordered_map<string, unordered_map<string, Gene>> tmp_gene_dict;
+    std::unordered_map<string, std::unordered_map<string, Gene>> tmp_gene_dict;
     int strand = 0;
     std::vector<string> token;
 
@@ -285,6 +284,37 @@ void GeneAnnotation::parse_bed_annotation(string bed_fn, bool fix_chrname)
         }
     }
 }
+
+
+int GeneAnnotation::ngenes()
+{
+    int gene_number = 0;
+    for (auto iter : gene_dict)
+    {
+        for (auto sub_iter : iter.second)
+        {
+            gene_number ++;
+        }
+    }
+
+    return gene_number;
+}
+
+
+std::vector<string> GeneAnnotation::get_genelist()
+{
+    std::vector<string> gene_list;
+    for (auto iter : gene_dict)
+    {
+        for (auto sub_iter : iter.second)
+        {
+            gene_list.push_back(sub_iter.gene_id);
+        }
+    }
+
+    return gene_list;
+}
+
 
 std::ostream& operator<< (std::ostream& out, const GeneAnnotation& obj)
 {
@@ -457,7 +487,7 @@ void Mapping::parse_align(string fn, string fn_out, bool m_strand, string map_ta
     const char * m_ptr = molecular_tag.c_str();
     const char * a_ptr = map_tag.c_str();
     char buf[999] = ""; // assume the length of barcode or UMI is less than 999
-    int cnt = 0;
+    int cnt = 1;
     while (bam_read1(fp, b) >= 0)
     {
         if (__DEBUG)

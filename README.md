@@ -20,11 +20,18 @@ This pipeline contains 4 programs:
 * sc_trim_barcode
 * sc_exon_mapping
 
+after `make install`. you can use `make test` to test the package. some test data and script will be in the `test` folder.
+
 Run any of the programs with no arguments to see usage instructions.
 
 ## Dependencies
-* [htslib](https://github.com/samtools/htslib) (Included with scPipe)
 * [zlib](https://github.com/madler/zlib) (Should be present on all modern macOS or Linux versions)
+
+## TODO
+
+* update UMI correction methods
+* update `basic_test.cpp` and remove local path dependencies.
+* simulate Drop-seq and MAR-seq data. and use them to test our pipeline.
 
 ## Acknowledgements
 This package is inspired by `scater` and `scran` packages. Output from this pipeline can be converted to `SCESet` class in `scater` for downstream analysis.

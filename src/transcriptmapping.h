@@ -7,12 +7,12 @@
 #include <algorithm>
 #include <vector>
 #include <cstring>
-#include <htslib/sam.h>
-#include <htslib/bgzf.h>
+#include "config_hts.h"
 #include "utils.h"
 
 #ifndef TRANSCRIPTMAPPING_H
 #define TRANSCRIPTMAPPING_H
+
 
 // for position, we dont store chromosome info because we will put genes from the same chromosome
 // together in a hashmap
@@ -53,6 +53,12 @@ public:
     int get_strand(char st);
     // add `chr` to chromosome name and change `MT` to `chrM`
     std::string fix_name(std::string na);
+
+    //get number of genes
+    int ngenes();
+
+    //return all gene id as a std::vector
+    std::vector<std::string> get_genelist();
 
     void parse_gff3_annotation(std::string gff3_fn, bool fix_chrname);
 

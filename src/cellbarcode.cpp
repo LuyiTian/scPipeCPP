@@ -9,6 +9,7 @@ using std::unordered_map;
 // protocols with two barcodes are merged as one.
 void Barcode::read_anno(string fn)
 {
+    check_file_exists(fn);
     std::ifstream infile(fn);
     string line;
     std::getline(infile, line); // skip header
