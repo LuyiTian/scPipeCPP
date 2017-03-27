@@ -108,7 +108,6 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
     {
         state = ONE_INDEX_WITH_UMI;
         bc1_end = id1_len;
-        uint8_t *idx = new uint8_t[id2_len + 1];
     }
 
     // set barcode end index
@@ -281,10 +280,6 @@ void paired_fastq_to_fastq(char *fq1_fn, char *fq2_fn, char *fq_out, const read_
     int umi_st = read_structure.umi_st;
     int umi_len = read_structure.umi_len;
 
-    // buffer
-    uint8_t *se = new uint8_t[id1_len+id2_len+1];
-    uint8_t *umi = new uint8_t[umi_len+1];
-
     int bc1_end, bc2_end; // get total length of index + UMI for read1 and read2
     int state; // 0 for two index with umi, 1 for two index without umi, 2 for one index with umi, 3 for one index without umi
 
@@ -303,7 +298,6 @@ void paired_fastq_to_fastq(char *fq1_fn, char *fq2_fn, char *fq_out, const read_
     {
         state = ONE_INDEX_WITH_UMI;
         bc1_end = id1_len;
-        uint8_t *idx = new uint8_t[id2_len + 1];
     }
 
     // set barcode end index

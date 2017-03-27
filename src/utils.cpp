@@ -56,7 +56,6 @@ Interval::Interval(int s, int e, int sd): st(s), en(e), snd(sd) {}
 
 int Interval::overlap(int st1, int en1)
 {
-  int s, e;
   if (en1 < st)
   {
     return -1;
