@@ -26,10 +26,10 @@ struct read_s
 // Filter settings
 struct filter_s
 {
-    bool if_check_qual;   // if remove low quality reads specified by `min_qual` and `mun_below_min`
-    bool if_remove_N;     // if remove reads contains N in UMI and barcode
-    int min_qual;         // base quality threshold
-    int num_below_min;    // max number of base that have quality below the threshold
+    bool if_check_qual;
+    bool if_remove_N;
+    int min_qual;
+    int num_below_min;
 };
 
 // Conversion functions

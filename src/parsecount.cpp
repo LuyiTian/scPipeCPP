@@ -33,7 +33,7 @@ int UMI_correct1(std::unordered_map<string, int>& UMI_count)
         {
             if (hamming_distance(UMI1->first, UMI2.first) == 1)
             {
-                if (UMI1->second == 1 || UMI1->second < UMI2.second*0.5)
+                if (UMI1->second == 1 || UMI1->second < UMI2.second*0.1)
                 {
                     found = true;
                     // merge two UMIs
@@ -77,7 +77,7 @@ std::unordered_map<string, int> UMI_dedup(std::unordered_map<string, std::vector
         else
         {
             std::cout << "not implemented" << std::endl;
-            exit(1); 
+            exit(1);
         }
 
         for (auto const& UMI: UMI_count)
@@ -90,7 +90,7 @@ std::unordered_map<string, int> UMI_dedup(std::unordered_map<string, std::vector
             {
                 UMI_dup_count[UMI.second-1] ++;
             }
-            
+
         }
 
         //TODO: add ATCG percentage
@@ -167,7 +167,7 @@ void get_counting_matrix(Barcode bar, string in_dir, int UMI_correct, bool read_
             {
                 auto & vec = gene_cnt_matrix[ge.first];
                 vec.resize(cell_number, 0); // init with all zeros
-                vec[ind] = ge.second; 
+                vec[ind] = ge.second;
             }
             else
             {

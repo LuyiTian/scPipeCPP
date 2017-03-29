@@ -91,7 +91,7 @@ int Bamdemultiplex::barcode_demultiplex(string bam_path, int max_mismatch)
 
     string output_dir = join_path(out_dir, "count");
     unordered_map<string, ofstream> out_fn_dict = bar.get_count_file_w(output_dir);
-    
+
     const char * c_ptr = c_tag.c_str();
     const char * m_ptr = m_tag.c_str();
     const char * g_ptr = g_tag.c_str();
@@ -100,7 +100,6 @@ int Bamdemultiplex::barcode_demultiplex(string bam_path, int max_mismatch)
     string bc_seq;
     string match_res;
     int tmp_cnt = 0;
-    int ret_code = 999999; // see `transcriptmapping.h` for different code
 
     while (bam_read1(fp, b) >= 0)
     {
@@ -153,17 +152,17 @@ int Bamdemultiplex::barcode_demultiplex(string bam_path, int max_mismatch)
                         out_fn_dict[bar.barcode_dict[match_res]] <<\
                          (bam_aux_get(b, g_ptr)+1) << "," <<\
                           (bam_aux_get(b, m_ptr)+1) << "," <<\
-                           b->core.pos << std::endl;                        
+                           b->core.pos << std::endl;
                     }
                     else
                     {
                         out_fn_dict[bar.barcode_dict[match_res]] <<\
                          (bam_aux_get(b, g_ptr)+1) << "," <<\
                           (bam_aux_get(b, m_ptr)+1) << "," <<\
-                           (-std::atoi((char*)bam_aux_get(b, a_ptr)+1)) << std::endl;                          
+                           (-std::atoi((char*)bam_aux_get(b, a_ptr)+1)) << std::endl;
                     }
 
-                    
+
                 }
             }
             else
@@ -196,29 +195,29 @@ int Bamdemultiplex::barcode_demultiplex(string bam_path, int max_mismatch)
                             overall_count_stat["barcode_unmatch_aligned"]++;
                         }
                     }
-                    
+
                 }
                 else
                 {
                     overall_count_stat["barcode_match"]++;
                     if (a_tag.empty())
                     {
-                        cell_align_unmapped[bar.barcode_dict[match_res]]++;                    
+                        cell_align_unmapped[bar.barcode_dict[match_res]]++;
                     }
                     else
                     {
                         tmp_cnt = std::atoi((char*)bam_aux_get(b, a_ptr)+1);
                         if (tmp_cnt == 1)
                         {
-                            cell_mapped_ambiguous[bar.barcode_dict[match_res]]++; 
+                            cell_mapped_ambiguous[bar.barcode_dict[match_res]]++;
                         }
                         else if (tmp_cnt == 2)
                         {
-                            cell_mapped_intron[bar.barcode_dict[match_res]]++; 
+                            cell_mapped_intron[bar.barcode_dict[match_res]]++;
                         }
                         else
                         {
-                            cell_align_unmapped[bar.barcode_dict[match_res]]++;  
+                            cell_align_unmapped[bar.barcode_dict[match_res]]++;
                         }
                     }
                 }

@@ -511,14 +511,6 @@ bam_hdr_t *sam_hdr_read(htsFile *fp)
     switch (fp->format.format) {
     case bam:
         return bam_hdr_read(fp->fp.bgzf);
-
-
-    case sam: {
-        kstring_t str;
-        bam_hdr_t *h;
-        return h;
-        }
-
     default:
         abort();
     }

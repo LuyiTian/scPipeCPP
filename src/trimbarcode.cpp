@@ -34,7 +34,7 @@ void kseq_t_to_bam_t(kseq_t *seq, bam1_t *b, int trim_n)
 {
     int seq_l = seq->seq.l - trim_n; // seq length after trim the barcode
     b->l_data = seq->name.l + 1 + (int)(1.5 * seq_l + (seq_l % 2 != 0)); // +1 includes the tailing '\0'
-    if (b->m_data < b->l_data) 
+    if (b->m_data < b->l_data)
     {
         b->m_data = b->l_data;
         kroundup32(b->m_data);
@@ -54,7 +54,7 @@ void kseq_t_to_bam_t(kseq_t *seq, bam1_t *b, int trim_n)
     int i = 0;
     for (i = 0; i < b->core.l_qseq;++i) // set sequence
     {
-        bam1_seq_seti(s, i, seq_nt16_table[seq->seq.s[i + trim_n]]);
+        bam1_seq_seti(s, i, seq_nt16_table[(int)seq->seq.s[i + trim_n]]);
     }
 
     s = bam_get_qual(b);
@@ -163,11 +163,11 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
     // main loop, iterate through each fastq record
     // assume there are the name number of reads in read1 and read2 files, not checked.
     while (((l1 = kseq_read(seq1)) >= 0) && ((l2 = kseq_read(seq2)) >= 0))
-    {  
+    {
         // qual check before we do anything
         if (filter_settings.if_check_qual)
         { // Only check barcode/UMI quality
-            if(!(check_qual(seq1->seq.s, bc1_end, filter_settings.min_qual, filter_settings.num_below_min) && 
+            if(!(check_qual(seq1->seq.s, bc1_end, filter_settings.min_qual, filter_settings.num_below_min) &&
                  check_qual(seq2->seq.s, bc2_end, filter_settings.min_qual, filter_settings.num_below_min)))
             {
                 removed_low_qual++;
@@ -182,15 +182,15 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
                 continue;
             }
         }
-        
+
         // begin processing valid read
         passed_reads++;
 
         bam1_t *b = bam_init1();
-        
+
         // move original read name
         int new_name_length = name_offset + seq1->name.l;
-        char* old_name_adr = seq1->name.s;  
+        char* old_name_adr = seq1->name.s;
         char* new_name_adr = old_name_adr + name_offset;
         int n_char_copied = seq1->name.l * sizeof(char);
         seq1->name.s = (char*)realloc(old_name_adr, new_name_length);
@@ -237,7 +237,7 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
     }
 
     // cleanup
-    kseq_destroy(seq1); kseq_destroy(seq2); // free seq 
+    kseq_destroy(seq1); kseq_destroy(seq2); // free seq
     gzclose(fq1); gzclose(fq2); // close fastq file
     sam_close(fp); // close bam file
 
@@ -279,6 +279,7 @@ void paired_fastq_to_fastq(char *fq1_fn, char *fq2_fn, char *fq_out, const read_
     int id2_len = read_structure.id2_len;
     int umi_st = read_structure.umi_st;
     int umi_len = read_structure.umi_len;
+
 
     int bc1_end, bc2_end; // get total length of index + UMI for read1 and read2
     int state; // 0 for two index with umi, 1 for two index without umi, 2 for one index with umi, 3 for one index without umi
@@ -344,7 +345,7 @@ void paired_fastq_to_fastq(char *fq1_fn, char *fq2_fn, char *fq_out, const read_
     // main loop, iter through each fastq records
     // ideally there should be equal number of reads in fq1 and fq2. we dont check this.
     while (((l1 = kseq_read(seq1)) >= 0) && ((l2 = kseq_read(seq2)) >= 0))
-    {  
+    {
         // qual check before we do anything
         if (filter_settings.if_check_qual)
         {
@@ -363,7 +364,7 @@ void paired_fastq_to_fastq(char *fq1_fn, char *fq2_fn, char *fq_out, const read_
                 continue;
             }
         }
-        
+
         passed_reads++;
 
         seq1->name.s = (char*)realloc(seq1->name.s, name_offset + seq1->name.l);
@@ -395,13 +396,13 @@ void paired_fastq_to_fastq(char *fq1_fn, char *fq2_fn, char *fq_out, const read_
         }
         seq1->name.s[name_offset-1] = '#';
         seq1->name.l = name_offset + seq1->name.l;
-        
+
         fq_write(o_stream, seq1, bc1_end); // write to fastq file
     }
 
     //std::cout << passed_reads << "\t" << removed_low_qual << "\t" << removed_have_N << std::endl;
 
-    kseq_destroy(seq1); kseq_destroy(seq2); // free seq 
+    kseq_destroy(seq1); kseq_destroy(seq2); // free seq
     gzclose(fq1); gzclose(fq2); // close fastq file
     o_stream.close(); // close out fastq file
     std::cerr << "pass QC: " << passed_reads << std::endl;

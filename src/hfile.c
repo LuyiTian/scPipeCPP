@@ -455,14 +455,6 @@ hFILE *hdopen(int fd, const char *mode)
     return &fp->base;
 }
 
-static hFILE *hopen_fd_fileuri(const char *url, const char *mode)
-{
-    if (strncmp(url, "file://localhost/", 17) == 0) url += 16;
-    else if (strncmp(url, "file:///", 8) == 0) url += 7;
-    else { errno = EPROTONOSUPPORT; return NULL; }
-
-    return hopen_fd(url, mode);
-}
 
 static hFILE *hopen_fd_stdinout(const char *mode)
 {
@@ -553,22 +545,6 @@ static const struct hFILE_backend mem_backend =
     mem_read, NULL, mem_seek, NULL, mem_close
 };
 
-static hFILE *hopen_mem(const char *data, const char *mode)
-{
-    if (strncmp(data, "data:", 5) == 0) data += 5;
-
-    // TODO Implement write modes, which will require memory allocation
-    if (strchr(mode, 'r') == NULL) { errno = EINVAL; return NULL; }
-
-    hFILE_mem *fp = (hFILE_mem *) hfile_init(sizeof (hFILE_mem), mode, 0);
-    if (fp == NULL) return NULL;
-
-    fp->buffer = data;
-    fp->length = strlen(data);
-    fp->pos = 0;
-    fp->base.backend = &mem_backend;
-    return &fp->base;
-}
 
 
 /*****************************************
@@ -590,20 +566,6 @@ struct hFILE_plugin_list {
 
 static struct hFILE_plugin_list *plugins = NULL;
 
-static void hfile_exit()
-{
-    kh_destroy(scheme_string, schemes);
-
-    while (plugins != NULL) {
-        struct hFILE_plugin_list *p = plugins;
-        if (p->plugin.destroy) p->plugin.destroy();
-#ifdef ENABLE_PLUGINS
-        if (p->plugin.obj) close_plugin(p->plugin.obj);
-#endif
-        plugins = p->next;
-        free(p);
-    }
-}
 
 void hfile_add_scheme_handler(const char *scheme,
                               const struct hFILE_scheme_handler *handler)

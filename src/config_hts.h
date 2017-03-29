@@ -3,9 +3,9 @@
 #ifndef CONFIG_HTS_H
 #define CONFIG_HTS_H
 
-#include "hts_bam/sam.h"
-#include "hts_bam/bgzf.h"
-#include "hts_bam/kseq.h"
+#include "sam.h"
+#include "bgzf.h"
+#include "kseq.h"
 
 /*
 #include <htslib/sam.h>

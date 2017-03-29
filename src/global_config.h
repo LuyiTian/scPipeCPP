@@ -3,6 +3,6 @@
 #ifndef GLOBALCONFIG_H
 #define GLOBALCONFIG_H
 
-const bool __DEBUG = true;
+const bool __DEBUG = false;
 
 #endif

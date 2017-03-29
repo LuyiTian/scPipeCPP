@@ -45,8 +45,6 @@ DEALINGS IN THE SOFTWARE.  */
 #if KS_BGZF
     // bgzf now supports gzip-compressed files, the gzFile branch can be removed
     KSTREAM_INIT2(, BGZF*, bgzf_read, 65536)
-#else
-    KSTREAM_INIT2(, gzFile, gzread, 16384)
 #endif
 
 #include "khash.h"
@@ -762,7 +760,6 @@ const char *hts_format_file_extension(const htsFormat *format) {
 }
 
 int hts_set_opt(htsFile *fp, enum hts_fmt_option opt, ...) {
-    int r;
     va_list args;
 
     if (opt == HTS_OPT_NTHREADS) {
@@ -782,7 +779,7 @@ int hts_set_threads(htsFile *fp, int n)
 {
     if (fp->format.compression == bgzf) {
         return bgzf_mt(fp->fp.bgzf, n, 256);
-    } 
+    }
     else return 0;
 }
 
