@@ -25,7 +25,7 @@ RM = rm -rf
 %.o: %.cpp
 	$(CXX) -c $(CPPFLAGS) $(LIBS) -o $@ $<
 
-%.hts.o: hts_bam/%.c
+%.hts.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 all: buildPipe buildtest
