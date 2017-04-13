@@ -1,9 +1,10 @@
 //detect_barcode.cpp
 
-#include "utils.h"
+#include "detect_barcode.h"
 
 void merge_barcode(std::unordered_map<std::string, int> &counter, int max_mismatch, int min_count)
 {
+    bool found;
     for (auto bc1 = counter.begin(); bc1 != counter.end();) // use normal iterator in order to use `erase`
     {
         found = false;
@@ -49,12 +50,13 @@ void merge_barcode(std::unordered_map<std::string, int> &counter, int max_mismat
 
 std::unordered_map<std::string, int> summarize_barcode(std::string fn, int bc_len, int max_reads, int max_mismatch, int min_count)
 {
-    BGZF *fp = bgzf_open(fn.c_str(), "r");  // input file
+    check_file_exists(fn);
+    gzFile fq = gzopen(fn.c_str(), "r"); // input fastq
     std::unordered_map<std::string, int> counter;
     std::string tmp_bc;
-    if (max_mismatch<1000)
+    if (max_reads<1000)
     {
-        std::cerr << "max_mismatch should be larger than 1000." << std::endl;
+        std::cerr << "max_reads should be larger than 1000." << std::endl;
         exit(1);
     }
     if (bc_len < 4)
@@ -63,12 +65,13 @@ std::unordered_map<std::string, int> summarize_barcode(std::string fn, int bc_le
         exit(1);
     }
 
-    kseq_t *seq1;
-    seq =  kseq_init(fq1);
+    kseq_t *seq;
+    seq =  kseq_init(fq);
     int cnt = 0;
-    while((cnt < max_mismatch) && (kseq_read(seq)>= 0))
+    int l1 = 0;
+    while((cnt < max_mismatch) && ((l1 = kseq_read(seq))>= 0))
     {
-        tmp_bc = string(seq->name.s).substr(0, bc_len);
+        tmp_bc = std::string(seq->name.s).substr(0, bc_len);
         if (counter.find(tmp_bc) != counter.end())
         {
             counter[tmp_bc] ++;
@@ -77,6 +80,7 @@ std::unordered_map<std::string, int> summarize_barcode(std::string fn, int bc_le
         {
             counter[tmp_bc] = 1;
         }
+        cnt++;
     }
 
     merge_barcode(counter, max_mismatch, min_count);

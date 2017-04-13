@@ -16,7 +16,7 @@ CFLAGS = -O2
 LIBS = -lz
 
 HTS_OBJS = sam.hts.o bgzf.hts.o hfile.hts.o hts.hts.o kstring.hts.o
-OBJS = utils.o cellbarcode.o parsebam.o parsecount.o trimbarcode.o transcriptmapping.o fq_simulator.o
+OBJS = utils.o cellbarcode.o parsebam.o parsecount.o trimbarcode.o transcriptmapping.o detect_barcode.o fq_simulator.o
 RM = rm -rf
 
 .PHONY: all clean buildtest runtest test buildPipe install devel
@@ -49,6 +49,7 @@ buildPipe: $(HTS_OBJS) $(OBJS)
 	$(CXX) -o bin/sc_gene_counting sc_gene_counting.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
 	$(CXX) -o bin/sc_trim_barcode sc_trim_barcode.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
 	$(CXX) -o bin/sc_exon_mapping sc_exon_mapping.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
+	$(CXX) -o bin/sc_detect_bc sc_detect_bc.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
 
 devel: $(HTS_OBJS) $(OBJS)
 	mkdir -p bin
@@ -56,6 +57,7 @@ devel: $(HTS_OBJS) $(OBJS)
 	$(CXX) -o bin/sc_gene_counting sc_gene_counting.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(DEVEL_FLAGS)
 	$(CXX) -o bin/sc_trim_barcode sc_trim_barcode.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(DEVEL_FLAGS)
 	$(CXX) -o bin/sc_exon_mapping sc_exon_mapping.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(DEVEL_FLAGS)
+	$(CXX) -o bin/sc_detect_bc sc_detect_bc.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
 
 clean:
 	$(RM) $(OBJS)
