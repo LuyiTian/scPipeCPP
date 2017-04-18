@@ -250,8 +250,8 @@ void paired_fastq_to_bam(char *fq1_fn, char *fq2_fn, char *bam_out, const read_s
 
 void fq_write(std::ofstream& o_stream, kseq_t *seq, int trim_n)
 {
-    o_stream << "@" << seq->name.s << std::endl << (seq->seq.s+trim_n) << std::endl;
-    o_stream << "+" << std::endl << (seq->qual.s+trim_n) << std::endl;
+    o_stream << "@" << seq->name.s << "\n" << (seq->seq.s+trim_n) << "\n";
+    o_stream << "+" << "\n" << (seq->qual.s+trim_n) << "\n";
 }
 
 
