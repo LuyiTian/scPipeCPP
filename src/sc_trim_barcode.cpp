@@ -1,7 +1,7 @@
 //sc_trim_barcode.cpp
 
-#include <iostream>
 #include "trimbarcode.h"
+#include "timing.h"
 
 using std::string;
 
@@ -116,8 +116,14 @@ int main(int argc, char* argv[]) {
         std::cout << "\t" << "minimal quality: " << fl.min_qual << std::endl;
         std::cout << "\t" << "maximum number of below-quality bases: " << fl.num_below_min << std::endl;
 
+        Timer timer;
+        timer.start();
+        timer.mode("minutes");
+        
         // Print options summary
         paired_fastq_to_fastq((char *)fq1_fn.c_str(), (char *)fq2_fn.c_str(), (char *)fq_out.c_str(), s, fl);
+
+        std::cout << "Time elapsed: " << timer.end() << std::endl;
         return 0;
     }
 }

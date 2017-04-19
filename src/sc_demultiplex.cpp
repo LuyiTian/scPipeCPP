@@ -1,6 +1,6 @@
-#include <iostream>
 #include "parsebam.h"
 #include "cellbarcode.h"
+#include "timing.h"
 
 using std::string;
 
@@ -76,6 +76,10 @@ int main(int argc, char* argv[]) {
         std::cout << "\t" << "max mismatch: " << max_mismatch << std::endl;
         std::cout << "\t" << "cell/molecular/gene tag: " << bc << "/"<< mb <<"/" << gb << std::endl;
 
+        Timer timer;
+        timer.start();
+        timer.mode("minutes");
+
         Barcode bar;
         bar.read_anno(anno_fn);
 
@@ -83,6 +87,9 @@ int main(int argc, char* argv[]) {
         
         bam_de.barcode_demultiplex(bam_fn, max_mismatch);
         bam_de.write_statistics("overall_stat", "chr_stat", "cell_stat");
+
+        std::cout << "Time elapsed: " << timer.end() << std::endl;
+        
         return 0;
     }
 }

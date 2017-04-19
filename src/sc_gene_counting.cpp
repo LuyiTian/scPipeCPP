@@ -1,9 +1,8 @@
 // gene_counting.cpp
 
-#include <iostream>
 #include "parsecount.h"
 #include "cellbarcode.h"
-
+#include "timing.h"
 
 int main(int argc, char* argv[]) {
     if (argc < 4) 
@@ -51,9 +50,16 @@ int main(int argc, char* argv[]) {
         std::cout << "\t" << "UMI_correction: " << UMI_correction << std::endl;
         std::cout << "\t" << "gene_filter " << gene_filter << std::endl;
 
+        Timer timer;
+        timer.start();
+        timer.mode("minutes");
+
         Barcode bar;
         bar.read_anno(annofn);
         get_counting_matrix(bar, out_dir, UMI_correction, gene_filter);
+
+        std::cout << "Time elapsed: " << timer.end() << std::endl;
+
         return 0;
     }
 }

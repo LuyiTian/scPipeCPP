@@ -1,7 +1,7 @@
 // sc_exon_mapping.cpp
 
-#include <iostream>
 #include "transcriptmapping.h"
+#include "timing.h"
 
 int main(int argc, char* argv[]) {
     if (argc < 4)
@@ -83,6 +83,10 @@ int main(int argc, char* argv[]) {
                 fix_chr = true;
             }
         }
+        
+        Timer timer;
+        timer.start();
+        timer.mode("minutes");
 
         std::vector<std::string> token = split(anno_files, ',');
 
@@ -114,6 +118,9 @@ int main(int argc, char* argv[]) {
             a.add_annotation(n, fix_chr);
         }
         a.parse_align(fn, fn_out, m_strand, am, ge, bc, mb, bc_len, UMI_len);
+        
+        std::cout << "Time elapsed: " << timer.end() << std::endl;
+        
         return 0;
     }
 }

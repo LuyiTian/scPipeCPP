@@ -10,13 +10,13 @@ prefix ?= /usr/local
 INSTALL = install -p
 INSTALL_PROGRAM = $(INSTALL)
 
-CPPFLAGS = -std=c++11 -O2
+CPPFLAGS = -std=c++11 -O2 -pthreads
 DEVEL_FLAGS = -std=c++11 -O2 -Wall -Wno-unused-function
 CFLAGS = -O2
 LIBS = -lz
 
 HTS_OBJS = sam.hts.o bgzf.hts.o hfile.hts.o hts.hts.o kstring.hts.o
-OBJS = utils.o cellbarcode.o parsebam.o parsecount.o trimbarcode.o transcriptmapping.o detect_barcode.o fq_simulator.o
+OBJS = utils.o cellbarcode.o parsebam.o parsecount.o trimbarcode.o transcriptmapping.o detect_barcode.o fq_simulator.o timing.o
 RM = rm -rf
 
 .PHONY: all clean buildtest runtest test buildPipe install devel
