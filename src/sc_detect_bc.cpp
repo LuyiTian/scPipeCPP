@@ -1,8 +1,7 @@
 // sc_detect_bc.cpp
 
-#include <iostream>
 #include "detect_barcode.h"
-
+#include "timing.h"
 
 int main(int argc, char* argv[]) {
     if (argc < 4) 
@@ -72,7 +71,7 @@ int main(int argc, char* argv[]) {
         std::cout << "\t" << "min count: " << min_count << std::endl;
         std::cout << "\t" << "max mismatch " << max_mismatch << std::endl;
 
-        std::unordered_map<std::string, int>counter = summarize_barcode(infq, bc_len, max_reads, max_mismatch, min_count);
+        std::unordered_map<std::string, int> counter = summarize_barcode(infq, bc_len, max_reads, max_mismatch, min_count);
         write_barcode_summary(outcsv, surfix, counter);
         return 0;
     }
