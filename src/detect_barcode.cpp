@@ -4,6 +4,18 @@
 
 void merge_barcode(std::unordered_map<std::string, int> &counter, int max_mismatch, int min_count)
 {
+    for (auto bc1 = counter.begin(); bc1 != counter.end();) // use normal iterator in order to use `erase`
+    {
+        if (bc1->second < min_count)
+        {
+            bc1 = counter.erase(bc1);
+        }
+        else
+        {
+            bc1++;
+        }
+    }
+
     bool found;
     for (auto bc1 = counter.begin(); bc1 != counter.end();) // use normal iterator in order to use `erase`
     {
@@ -32,18 +44,6 @@ void merge_barcode(std::unordered_map<std::string, int> &counter, int max_mismat
             bc1++;
         }
     }
-
-    for (auto bc1 = counter.begin(); bc1 != counter.end();) // use normal iterator in order to use `erase`
-    {
-        if (bc1->second < min_count)
-        {
-            bc1 = counter.erase(bc1);
-        }
-        else
-        {
-            bc1++;
-        }
-    }
 }
 
 
@@ -54,7 +54,11 @@ std::unordered_map<std::string, int> summarize_barcode(std::string fn, int bc_le
     gzFile fq = gzopen(fn.c_str(), "r"); // input fastq
     std::unordered_map<std::string, int> counter;
     std::string tmp_bc;
-    if (max_reads<1000)
+    if (max_reads <= 0)
+    {
+        max_reads = std::numeric_limits<int>::max();
+    }
+    else if ((max_reads > 0) && (max_reads < 1000))
     {
         std::cerr << "max_reads should be larger than 1000." << std::endl;
         exit(1);
@@ -69,7 +73,7 @@ std::unordered_map<std::string, int> summarize_barcode(std::string fn, int bc_le
     seq =  kseq_init(fq);
     int cnt = 0;
     int l1 = 0;
-    while((cnt < max_mismatch) && ((l1 = kseq_read(seq))>= 0))
+    while((cnt < max_reads) && ((l1 = kseq_read(seq))>= 0))
     {
         tmp_bc = std::string(seq->name.s).substr(0, bc_len);
         if (counter.find(tmp_bc) != counter.end())
@@ -82,6 +86,8 @@ std::unordered_map<std::string, int> summarize_barcode(std::string fn, int bc_le
         }
         cnt++;
     }
+    kseq_destroy(seq);
+    gzclose(fq);
 
     merge_barcode(counter, max_mismatch, min_count);
 
