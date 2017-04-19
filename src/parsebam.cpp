@@ -90,8 +90,8 @@ int Bamdemultiplex::barcode_demultiplex(string bam_path, int max_mismatch)
     }
 
     string output_dir = join_path(out_dir, "count");
-    unordered_map<string, ofstream> out_fn_dict = bar.get_count_file_w(output_dir);
-
+    unordered_map<string, string> out_fn_path = bar.get_count_file_path(output_dir);
+    unordered_map<string, std::vector<string>> out_reads;
     const char * c_ptr = c_tag.c_str();
     const char * m_ptr = m_tag.c_str();
     const char * g_ptr = g_tag.c_str();
@@ -99,6 +99,8 @@ int Bamdemultiplex::barcode_demultiplex(string bam_path, int max_mismatch)
 
     string bc_seq;
     string match_res;
+    std::stringstream ss;
+    string tmp_c;
     int tmp_cnt = 0;
 
     while (bam_read1(fp, b) >= 0)
@@ -149,17 +151,19 @@ int Bamdemultiplex::barcode_demultiplex(string bam_path, int max_mismatch)
                     }
                     if (a_tag.empty())
                     {
-                        out_fn_dict[bar.barcode_dict[match_res]] <<\
-                         (bam_aux_get(b, g_ptr)+1) << "," <<\
-                          (bam_aux_get(b, m_ptr)+1) << "," <<\
-                           b->core.pos << std::endl;
+                        ss << (bam_aux_get(b, g_ptr)+1)<<","<<(bam_aux_get(b, m_ptr)+1)<<","<<(b->core.pos);
+                        ss >> tmp_c;
+                        out_reads[bar.barcode_dict[match_res]].push_back(tmp_c);
+                        ss.str("");
+                        tmp_c="";
                     }
                     else
                     {
-                        out_fn_dict[bar.barcode_dict[match_res]] <<\
-                         (bam_aux_get(b, g_ptr)+1) << "," <<\
-                          (bam_aux_get(b, m_ptr)+1) << "," <<\
-                           (-std::atoi((char*)bam_aux_get(b, a_ptr)+1)) << std::endl;
+                        ss << (bam_aux_get(b, g_ptr)+1)<<","<<(bam_aux_get(b, m_ptr)+1)<<","<<(-std::atoi((char*)bam_aux_get(b, a_ptr)+1));
+                        ss >> tmp_c;
+                        out_reads[bar.barcode_dict[match_res]].push_back(tmp_c);
+                        ss.str("");
+                        tmp_c="";
                     }
 
 
@@ -224,6 +228,18 @@ int Bamdemultiplex::barcode_demultiplex(string bam_path, int max_mismatch)
             }
         }
     }
+
+    for (auto const& fn: out_fn_path)
+    {
+        ofstream ofile(fn.second);
+        for (auto const& rd: out_reads[fn.first])
+        {
+            ofile << rd << "\n";
+        }
+        ofile.close();
+    }
+
+
 
     bgzf_close(fp);
     return 0;
