@@ -20,6 +20,7 @@ std::unordered_map<string, std::vector<string>> read_count(string fn, char sep)
         gene_read[gene_id].push_back(UMI);
 
     }
+    infile.close();
     return gene_read;
 }
 
