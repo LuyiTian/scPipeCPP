@@ -72,3 +72,4 @@ install:
 	$(INSTALL_PROGRAM) bin/sc_gene_counting $(prefix)/bin/sc_gene_counting
 	$(INSTALL_PROGRAM) bin/sc_trim_barcode $(prefix)/bin/sc_trim_barcode
 	$(INSTALL_PROGRAM) bin/sc_exon_mapping $(prefix)/bin/sc_exon_mapping
+	$(INSTALL_PROGRAM) bin/sc_detect_bc $(prefix)/bin/sc_detect_bc
