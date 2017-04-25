@@ -109,7 +109,7 @@ public:
 
 };
 
-// fastq reads that simulate the CEL-seq2 protocol
+// generate fastq reads that simulate the CEL-seq2 protocol
 class Celseq2Simulator: public FastqSimulator
 {
 public:
@@ -117,6 +117,18 @@ public:
     Celseq2Simulator(std::string annofn, std::string barfn, unsigned seed);
     void makefq(std::string R1fn, std::string R2fn, std::string reffa);
     void makefq(std::string R1fn, std::string R2fn, std::string reffa, int UMI_len, int r_len, int frag_mean, int dup_mean);
+};
+
+
+// generate fastq reads that simulate the Drop-seq protocol
+class DropseqSimulator: public FastqSimulator
+{
+public:
+    DropseqSimulator(std::string annofn, int cel_num);
+    DropseqSimulator(std::string annofn, int cel_num, unsigned seed);
+    void generate_cell_barcode();
+    void makefq(std::string R1fn, std::string R2fn, std::string reffa);
+    void makefq(std::string R1fn, std::string R2fn, std::string reffa, int bc_len, int UMI_len, int r_len, int frag_mean, int dup_mean);
 };
 
 #endif

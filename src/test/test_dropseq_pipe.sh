@@ -1,23 +1,23 @@
 set -x
 
 # file can be *.gz or *.fastq
-fq1="celseq2/simu_celseq2_R1.fq"
-fq2="celseq2/simu_celseq2_R2.fq"
+fq1="dropseq/simu_dropseq_R1.fq"
+fq2="dropseq/simu_dropseq_R2.fq"
 
 # no index1
 index1_start=-1 
 # trim 2bp of read1
 index1_len=2
 
-index2_start=6
-index2_len=8
-umi_start=0
-umi_len=6
+index2_start=0
+index2_len=12
+umi_start=12
+umi_len=8
 
 # experiment name
-expr_name=test_celseq2
+expr_name=test_dropseq
 
-out_dir=celseq2
+out_dir=dropseq
 
 mkdir -p $out_dir
 mkdir -p $out_dir/count
@@ -48,7 +48,9 @@ sc_exon_mapping -O $mapped_bam -I $aligned_bam -A $pseudo_ERCC_anno -BL $index2_
 
 #### demultiplexing
 
-barcode_anno="test_data/barcode_anno.csv"
+barcode_anno=$out_dir/barcode_anno.csv
+
+sc_detect_bc -I $unaligned_fq -O $barcode_anno -L $index2_len  # first detect cell barcode and generate barcode annotation
 
 sc_demultiplex -I $mapped_bam -O $out_dir -A $barcode_anno
 
