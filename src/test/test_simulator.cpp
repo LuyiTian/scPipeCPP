@@ -104,6 +104,17 @@ void generate_celseq2_data()
 }
 
 
+void generate_Dropseq_data()
+{
+    std::string R1fn = "dropseq/simu_dropseq_R1.fq";
+    std::string R2fn = "dropseq/simu_dropseq_R2.fq";
+    DropseqSimulator sim(pseudo_ERCCfn, 10, 666);
+    std::vector<double> param = {1, 100};
+    sim.gen_gene_expression("gamma_random", param);
+    sim.makefq(R1fn, R2fn, ERCCfafn);
+}
+
+
 
 
 int main(int argc, char* argv[])
@@ -128,6 +139,7 @@ int main(int argc, char* argv[])
     print_result(test_result, passed_test, failed_test);
 
     generate_celseq2_data();
+    generate_Dropseq_data();
 
     // print all test result
     std::cout << "passed_test: " << passed_test << "; " 

@@ -261,5 +261,110 @@ void Celseq2Simulator::makefq(std::string R1fn, std::string R2fn, std::string re
 }
 
 
+// ############################ Dropseq
 
+
+DropseqSimulator::DropseqSimulator(std::string annofn, int cel_num, unsigned seed): FastqSimulator(annofn, seed)
+{
+    cell_cnt = cel_num;
+    int dig = std::to_string(cell_cnt).length()+1;
+    for (int i = 0; i < cell_cnt; ++i)
+    {
+       Bar.cellid_list.push_back("CELL_"+padding(i, dig));
+    }
+    Cnt_sim.init_mat(Anno.get_genelist(), Bar.cellid_list);
+}
+
+DropseqSimulator::DropseqSimulator(std::string annofn, int cel_num): DropseqSimulator(annofn, cel_num, std::chrono::high_resolution_clock::now().time_since_epoch().count()) {}
+
+
+
+void DropseqSimulator::makefq(std::string R1fn, std::string R2fn, std::string reffa, int bc_len, int UMI_len, int r_len, int frag_mean, int dup_mean)
+{
+    int dup_count, molecular_count, frag_len;
+    auto get_dup = std::bind(std::gamma_distribution<double>(1, dup_mean),
+                           eng);  // assume the PCR duplicate number follows gamma distribution
+    auto get_frag = std::bind(std::normal_distribution<double>(frag_mean, frag_mean/5),
+                           eng);  // assume the fragment length follows normal distribution
+     // used for getting the random UMI sequence from an ATGC vector
+
+    std::string UMI_seq, transcript_seq;
+
+    for (int i = 0; i < cell_cnt; ++i)
+    {
+        Bar.barcode_list.push_back(gen_random_seq(bc_len));
+    }
+
+    int gene_digit = std::to_string(Anno.get_genelist().size()).length()+1;
+    int cell_digit = std::to_string(cell_cnt).length()+1;
+    int molecule_digit = std::to_string(Cnt_sim.cnt_mat.maxCoeff()).length()+1;
+    FqWriter R1(R1fn);
+    FqWriter R2(R2fn);
+
+    int global_count = 0;
+    FaReader fareader = FaReader(reffa);
+    while (fareader.readone())
+    {
+        if(__DEBUG)
+        {
+            std::cout << "read fasta sequence " << fareader.fa.name << " with lenth " << fareader.fa.seq.length() << std::endl;
+        }
+        if (Anno.gene_dict.end() == Anno.gene_dict.find(fareader.fa.name))
+        {
+            std::cerr << "cannot find chromosome (" << fareader.fa.name << ") in exon annotation." << std::endl;
+            exit(1);
+        }
+        for (int gene_ix=0; gene_ix<Anno.gene_dict[fareader.fa.name].size(); ++gene_ix)  // for each genes in that chromosome
+        {
+            if(__DEBUG){std::cout<< "simulate gene " << gene_ix << std::endl;}
+            transcript_seq = get_transcript_seq(Anno.gene_dict[fareader.fa.name][gene_ix], fareader.fa);  // gene transcript
+
+            for (int cell_ix=0; cell_ix<cell_cnt; ++cell_ix)  // for each cells
+            {
+                if(__DEBUG){std::cout<< "\tsimulate cell " << cell_ix << std::endl;}
+                molecular_count = Cnt_sim.get_cnt(Anno.gene_dict[fareader.fa.name][gene_ix].gene_id, Bar.cellid_list[cell_ix]);
+
+                for (int m = 0; m < molecular_count; ++m)  // for each mRNA molecule
+                {
+                    UMI_seq = gen_random_seq(UMI_len);  // generate UMI sequence for this mRNA
+                    dup_count = std::ceil(get_dup());
+                    dup_count = (dup_count<2)?2:dup_count;  // should be larger than one
+
+                    frag_len = std::ceil(get_frag());
+                    frag_len = (frag_len<(r_len+1))?(r_len+1):frag_len;  // should be larger than read length
+                    frag_len = (frag_len<(transcript_seq.length()))?frag_len:transcript_seq.length();  // should be smaller than transcript length
+
+                    for (int d = 0; d < dup_count; ++d)  // for each PCR duplicates
+                    {
+                        // set name
+                        // fastq name : SIMULATE_SEQ::cell_idx::gene_idx::molecule_idx::duplicate_idx
+                        R1.fq.name = "SIMULATE_SEQ::" + padding(cell_ix, cell_digit) + "::" + padding(gene_ix, gene_digit) + \
+                            "::" + padding(m, molecule_digit) + "::" + std::to_string(d);
+                        R2.fq.name = R1.fq.name;
+                        // set sequence
+                        R1.fq.seq = transcript_seq.substr(transcript_seq.length()-frag_len, r_len);  // read one is transcipt
+                        R2.fq.seq = Bar.barcode_list[cell_ix] + UMI_seq;
+                        // set quality
+                        R1.fq.qual = std::string(R1.fq.seq.length(), 'A');  // assume all seq has high quality (quality score=32)
+                        R2.fq.qual = std::string(R2.fq.seq.length(), 'A');
+
+                        R1.writeone();
+                        R2.writeone();
+                        global_count++;
+                    }
+                }
+                if(__DEBUG){std::cout<< "\t\tsimulate molecule. count: " << molecular_count << std::endl;}
+            }
+        }
+    }
+    std::cerr << "simulate finished" << std::endl;
+    std::cerr << "\tcell number: " << cell_cnt << std::endl;
+    std::cerr << "\tgene number: " << Anno.get_genelist().size() << std::endl;
+    std::cerr << "\ttotal number of reads: " << global_count << std::endl;
+}
+
+void DropseqSimulator::makefq(std::string R1fn, std::string R2fn, std::string reffa)
+{
+    makefq(R1fn, R2fn, reffa, 12, 8, 50, 300, 10);
+}
 

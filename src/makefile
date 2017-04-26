@@ -35,7 +35,8 @@ buildtest:
 	#$(CXX) -o test/basic_test test/basic_test.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
 
 testpipe:
-	cd test && chmod u+x ./test_celseq2_pipe.sh && ./test_celseq2_pipe.sh
+	cd test && chmod u+x ./test_celseq2_pipe.sh && ./test_celseq2_pipe.sh 
+	cd test && chmod u+x ./test_dropseq_pipe.sh && ./test_dropseq_pipe.sh
 
 runtest:
 	cd test && ./test_simulator
@@ -66,6 +67,7 @@ clean:
 	$(RM) test/basic_test
 	$(RM) test/test_simulator
 	$(RM) test/celseq2/*
+	$(RM) test/dropseq/*
 
 install:
 	$(INSTALL_PROGRAM) bin/sc_demultiplex $(prefix)/bin/sc_demultiplex

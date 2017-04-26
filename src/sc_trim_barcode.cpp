@@ -41,6 +41,7 @@ int main(int argc, char* argv[]) {
         fl.if_remove_N = false;
         fl.min_qual = 30;
         fl.num_below_min = 1;
+        fq2_fn = "";
         for (int i = 1; i < argc; i++) 
         {
             string arg = argv[i];
@@ -121,7 +122,15 @@ int main(int argc, char* argv[]) {
         timer.mode("minutes");
         
         // Print options summary
-        paired_fastq_to_fastq((char *)fq1_fn.c_str(), (char *)fq2_fn.c_str(), (char *)fq_out.c_str(), s, fl);
+        if (fq2_fn.empty())
+        {
+            single_fastq_to_fastq((char *)fq1_fn.c_str(), (char *)fq_out.c_str(), s, fl);
+        }
+        else
+        {
+            paired_fastq_to_fastq((char *)fq1_fn.c_str(), (char *)fq2_fn.c_str(), (char *)fq_out.c_str(), s, fl);
+        }
+        
 
         std::cout << "Time elapsed: " << timer.end() << std::endl;
         return 0;
