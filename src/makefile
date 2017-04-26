@@ -10,7 +10,7 @@ prefix ?= /usr/local
 INSTALL = install -p
 INSTALL_PROGRAM = $(INSTALL)
 
-CPPFLAGS = -std=c++11 -O2 -pthread
+CPPFLAGS = -std=c++11 -O2 -pthread -static-libstdc++
 DEVEL_FLAGS = -std=c++11 -O2 -pthread -Wall -Wno-unused-function
 CFLAGS = -O2
 LIBS = -lz
