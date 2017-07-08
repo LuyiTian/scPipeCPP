@@ -29,9 +29,12 @@ void Barcode::read_anno(string fn)
         exit(-1);
     }
 
-    while(std::getline(infile, line))
+    while (std::getline(infile, line))
     {
         std::stringstream linestream(line);
+
+        if (trim_whitespace(linstream.str()) == "") continue;
+
         string cell_id;
         string barcode;
 
@@ -53,7 +56,7 @@ unordered_map<string, string> Barcode::get_count_file_path(string out_dir)
 {
     string csv_fmt = ".csv";
     unordered_map<string, string> out_fn_dict;
-    for(const auto& n : cellid_list) 
+    for (const auto& n : cellid_list) 
     {
         out_fn_dict[n] = join_path(out_dir, n+csv_fmt);
     }
@@ -102,7 +105,7 @@ string Barcode::get_closest_match(string bc_seq, int max_mismatch)
 
 std::ostream& operator<< (std::ostream& out, const Barcode& obj)
 {
-    for( const auto& n : obj.barcode_dict ) 
+    for ( const auto& n : obj.barcode_dict ) 
     {
         out << "Barcode:[" << n.first << "] Cell Id:[" << n.second << "]\n";
     }
