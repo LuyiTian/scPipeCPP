@@ -50,6 +50,11 @@ void Barcode::read_anno(string fn)
         
         barcode_list.push_back(barcode);
     }
+        if (cellid_list.size() == 0)
+    {
+        std::cerr << "no cell barcode in annotation files.";
+        exit(1);
+    }
 }
 
 unordered_map<string, string> Barcode::get_count_file_path(string out_dir)

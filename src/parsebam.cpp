@@ -16,6 +16,7 @@ Bamdemultiplex::Bamdemultiplex(string odir, Barcode b, string cellular_tag, stri
     out_dir = odir;
     mt_tag = MT_tag;
 
+
     for (const auto& n : bar.cellid_list)
     {
         cell_mapped_exon[n] = 0;
@@ -231,7 +232,6 @@ int Bamdemultiplex::barcode_demultiplex(string bam_path, int max_mismatch)
         }
         ofile.close();
     }
-
 
 
     bgzf_close(fp);
