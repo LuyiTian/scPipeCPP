@@ -84,7 +84,7 @@ std::vector<std::string> &split(const std::string &s, char delim, std::vector<st
 {
     std::stringstream ss(s);
     std::string item;
-    while (getline(ss, item, delim)) {
+    while (std::getline(ss, item, delim)) {
         elems.push_back(item);
     }
     return elems;
@@ -102,4 +102,15 @@ std::string padding(int count, int zero_num)
   std::ostringstream ss;
   ss << std::setw(zero_num) << std::setfill('0') << count;
   return ss.str();
+}
+
+// trim leading and trailing whitespace
+std::string trim_whitespace(const std::string &str)
+{
+    std::string output(str);
+
+    output = std::regex_replace(output, std::regex("^\\s+"), "");
+    output = std::regex_replace(output, std::regex("\\s+$"), "");
+
+    return output;
 }
