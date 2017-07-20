@@ -33,7 +33,7 @@ void Barcode::read_anno(string fn)
     {
         std::stringstream linestream(line);
 
-        if (trim_whitespace(linstream.str()) == "") continue;
+        if (trim_whitespace(linestream.str()) == "") continue;
 
         string cell_id;
         string barcode;

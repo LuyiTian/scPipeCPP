@@ -55,4 +55,7 @@ std::vector<std::string> split(const std::string &s, char delim);
 
 std::string padding(int count, int zero_num);
 
+// trim leading and trailing whitespaces
+std::string trim_whitespace(const std::string &str);
+
 #endif
