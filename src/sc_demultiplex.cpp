@@ -16,7 +16,8 @@ int main(int argc, char* argv[]) {
             "\t-MB <molecular_tag> two characters UMI tag used in bam file (default: `XM`)\n"<<\
             "\t-BC <cellular_tag> two characters cell barcode tag used in bam file (default: `XC`)\n"<<\
             "\t-MP <cellular_tag> two characters mapping status tag used in bam file (default: `YE`)\n"<<\
-            "\t-MI <mitochondrial_chromosome_name> should be consistant with the chromosome name in bam file.(default: `chrM`)\n"; 
+            "\t-MI <mitochondrial_chromosome_name> should be consistant with the chromosome name in bam file.(default: `chrM`)\n"; <<\
+            "\t-NOUMI <no_umi> whether the protocol contains UMIs, if set then UMI dedup will be skipped\n";
         exit(0);
     } 
     else 
@@ -28,6 +29,7 @@ int main(int argc, char* argv[]) {
         string am = "YE";
         string mt = "chrM";
         int max_mismatch = 1;
+        bool has_UMI = true;
         for (int i = 1; i < argc; i++) 
         {
             string arg = argv[i];
@@ -67,6 +69,10 @@ int main(int argc, char* argv[]) {
                     mt = argv[i + 1];
                 }
             }
+            if (arg == "-NOUMI")
+            {
+                has_UMI = false;                    
+            }
         }
         std::cout << "######### demultiplexing:" << std::endl;
         std::cout << "parameters:" << std::endl;
@@ -84,7 +90,7 @@ int main(int argc, char* argv[]) {
         bar.read_anno(anno_fn);
         Bamdemultiplex bam_de = Bamdemultiplex(out_dir, bar, bc, mb, gb, am, mt);
         
-        bam_de.barcode_demultiplex(bam_fn, max_mismatch);
+        bam_de.barcode_demultiplex(bam_fn, max_mismatch, has_UMI);
         bam_de.write_statistics("overall_stat", "chr_stat", "cell_stat");
 
         std::cout << "Time elapsed: " << timer.end() << std::endl;
