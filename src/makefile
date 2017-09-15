@@ -51,6 +51,7 @@ buildPipe: $(HTS_OBJS) $(OBJS)
 	$(CXX) -o bin/sc_trim_barcode sc_trim_barcode.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
 	$(CXX) -o bin/sc_exon_mapping sc_exon_mapping.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
 	$(CXX) -o bin/sc_detect_bc sc_detect_bc.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
+	$(CXX) -o bin/sc_split_bam sc_split_bam.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
 
 devel: $(HTS_OBJS) $(OBJS)
 	mkdir -p bin
@@ -59,6 +60,7 @@ devel: $(HTS_OBJS) $(OBJS)
 	$(CXX) -o bin/sc_trim_barcode sc_trim_barcode.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(DEVEL_FLAGS)
 	$(CXX) -o bin/sc_exon_mapping sc_exon_mapping.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(DEVEL_FLAGS)
 	$(CXX) -o bin/sc_detect_bc sc_detect_bc.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
+	$(CXX) -o bin/sc_split_bam sc_split_bam.cpp $(LIBS) $(OBJS) $(HTS_OBJS) $(CPPFLAGS)
 
 clean:
 	$(RM) $(OBJS)

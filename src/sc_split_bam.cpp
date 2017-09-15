@@ -7,17 +7,13 @@ using std::string;
 int main(int argc, char* argv[]) {
     if (argc < 6) 
     { // Insufficient parameters
-        std::cout << "Usage: sc_demultiplex \n" <<\
+        std::cout << "Usage: sc_split_bam \n" <<\
             "\t-I <infile> the input bam file (required)\n"<<\
             "\t-O <outdir> the output dir (required)\n"<<\
             "\t-A <barcode_annotation_file> annotate barcode and cell_id, \n for Drop-seq data you should run `./sc_detect_bc` to get the annotation file (required)\n"<<\
             "\t-M <max_mismatch> maximum mismatch allowed when matching barcode (default: 1)\n"<<\
-            "\t-GE <gene_tag> two characters gene tag used in bam file (default: `GE`)\n"<<\
-            "\t-MB <molecular_tag> two characters UMI tag used in bam file (default: `XM`)\n"<<\
-            "\t-BC <cellular_tag> two characters cell barcode tag used in bam file (default: `XC`)\n"<<\
-            "\t-MP <cellular_tag> two characters mapping status tag used in bam file (default: `YE`)\n"<<\
-            "\t-MI <mitochondrial_chromosome_name> should be consistant with the chromosome name in bam file.(default: `chrM`)\n" <<\
-            "\t-NOUMI <no_umi> whether the protocol contains UMIs, if set then UMI dedup will be skipped\n";
+            "\t-T <max_tmp_reads> maximum number of temporal reads to keep in memory (default: 1000000)\n"<<\
+            "\t-BC <cellular_tag> two characters cell barcode tag used in bam file (default: `XC`)\n";
         exit(0);
     } 
     else 
@@ -29,6 +25,7 @@ int main(int argc, char* argv[]) {
         string am = "YE";
         string mt = "chrM";
         int max_mismatch = 1;
+        int max_tmp_reads = 1000000;
         bool has_UMI = true;
         for (int i = 1; i < argc; i++) 
         {
@@ -40,38 +37,26 @@ int main(int argc, char* argv[]) {
                 {
                     bam_fn = argv[i + 1];
                 } 
-                else if (arg == "-O") 
-                {
-                    out_dir = argv[i + 1];
-                } 
                 else if (arg == "-A") 
                 {
                     anno_fn = argv[i + 1];
                 }
+                else if (arg == "-O") 
+                {
+                    out_dir = argv[i + 1];
+                } 
                 else if (arg == "-M")
                 {
                     max_mismatch = argv[i + 1][0]-'0';
                 }
-                else if (arg == "-GE")
+                else if (arg == "-T")
                 {
-                    gb = argv[i + 1];
-                }
-                else if (arg == "-MB")
-                {
-                    mb = argv[i + 1];
+                    max_tmp_reads = std::atoi(argv[i + 1]);
                 }
                 else if (arg == "-BC")
                 {
                     bc = argv[i + 1];
                 }
-                else if (arg == "-MI")
-                {
-                    mt = argv[i + 1];
-                }
-            }
-            if (arg == "-NOUMI")
-            {
-                has_UMI = false;                    
             }
         }
         std::cout << "######### demultiplexing:" << std::endl;
@@ -80,7 +65,8 @@ int main(int argc, char* argv[]) {
         std::cout << "\t" << "out dir: " << out_dir << std::endl;
         std::cout << "\t" << "annotation file: " << anno_fn << std::endl;
         std::cout << "\t" << "max mismatch: " << max_mismatch << std::endl;
-        std::cout << "\t" << "cell/molecular/gene tag: " << bc << "/"<< mb <<"/" << gb << std::endl;
+        std::cout << "\t" << "max temporal reads: " << max_tmp_reads << std::endl;
+        std::cout << "\t" << "cell tag: " << bc << std::endl;
 
         Timer timer;
         timer.start();
@@ -89,9 +75,7 @@ int main(int argc, char* argv[]) {
         Barcode bar;
         bar.read_anno(anno_fn);
         Bamdemultiplex bam_de = Bamdemultiplex(out_dir, bar, bc, mb, gb, am, mt);
-        
-        bam_de.barcode_demultiplex(bam_fn, max_mismatch, has_UMI);
-        bam_de.write_statistics("overall_stat", "chr_stat", "cell_stat");
+        bam_de.split_bam(bam_fn, max_mismatch, max_tmp_reads);
 
         std::cout << "Time elapsed: " << timer.end() << std::endl;
         
