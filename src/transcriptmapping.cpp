@@ -151,7 +151,7 @@ string GeneAnnotation::fix_name(string na)
     string new_na;
     if (na.compare(0,3,"chr") == 0)
     {
-        return na;
+        return na.substr(3);
     }
     else if (na.length() > 4) // just fix 1-22, X, Y, MT. ignore contig and ERCC
     {
@@ -163,9 +163,13 @@ string GeneAnnotation::fix_name(string na)
         {
             new_na = "chrM";
         }
+        else if(na == "chrM")
+        {
+            new_na = "MT";
+        }
         else
         {
-            new_na = "chr"+na;
+            return na;
         }
         return new_na;
     }
