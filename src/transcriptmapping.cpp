@@ -262,12 +262,12 @@ void GeneAnnotation::parse_bed_annotation(string bed_fn, bool fix_chrname)
         if (fix_chrname)
         {
             tmp_gene_dict[fix_name(token[1])][token[0]].add_exon(Interval(std::atoi(token[2].c_str()), std::atoi(token[3].c_str()), strand));
-            tmp_gene_dict[fix_name(token[1])][token[0]].set_ID(token[1]);
+            tmp_gene_dict[fix_name(token[1])][token[0]].set_ID(token[0]);
         }
         else
         {
             tmp_gene_dict[token[1]][token[0]].add_exon(Interval(std::atoi(token[2].c_str()), std::atoi(token[3].c_str()), strand));
-            tmp_gene_dict[token[1]][token[0]].set_ID(token[1]);
+            tmp_gene_dict[token[1]][token[0]].set_ID(token[0]);
         }
 
     }
