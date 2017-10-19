@@ -84,9 +84,6 @@ int main(int argc, char* argv[]) {
             }
         }
         
-        Timer timer;
-        timer.start();
-        timer.mode("minutes");
 
         std::vector<std::string> token = split(anno_files, ',');
 
@@ -117,6 +114,9 @@ int main(int argc, char* argv[]) {
         {
             a.add_annotation(n, fix_chr);
         }
+        Timer timer;
+        timer.start();
+        timer.mode("seconds");
         a.parse_align(fn, fn_out, m_strand, am, ge, bc, mb, bc_len, UMI_len);
         
         std::cout << "Time elapsed: " << timer.end() << std::endl;

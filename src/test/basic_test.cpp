@@ -45,10 +45,26 @@ bool test_hamming_distance()
 
 bool test_vector_counter()
 {
-    std::cout << "\t" << "test hamming_distance() ...";
+    std::cout << "\t" << "test vector_counter() ...";
     std::vector<std::string> v = {"ATGCTAAC", "ATCTGCCC", "ATGCTAAC", "GTAGTAG"};
     std::unordered_map<std::string, int> tmp_res = vector_counter(v);
     return tmp_res["ATGCTAAC"] == 2;
+}
+
+bool test_flat_exon()
+{
+    std::cout << "\t" << "test Gene::sort_exon(true) ...";
+    Gene a_gene;
+    a_gene.set_ID("GENE_A");
+    a_gene.add_exon(Interval(0,100,1));
+    a_gene.add_exon(Interval(80,200,1));
+    a_gene.add_exon(Interval(300,400,1));
+    bool tmp1 = a_gene.exon_vec.size()==3 && \
+        a_gene.exon_vec.back().st == 300;
+    a_gene.sort_exon(true);
+    bool tmp2 = a_gene.exon_vec.size()==2 && \
+        a_gene.exon_vec.front().en == 200;   
+    return tmp1 && tmp2;
 }
 
 
@@ -63,6 +79,19 @@ bool test_overlap()
         a > b;
     return tmp;
 }
+
+
+//bool test_overlap()
+//{
+//    std::cout << "\t" << "test Interval::overlap() ...";
+//    Interval a = Interval(500,700);
+//    Interval b = Interval(300,480);
+//    bool tmp = a.overlap(400,510) == 0 && \
+//        a.overlap(690,790) == 0 && \
+//        a.overlap(300,900) == 0  && \
+//        a > b;
+//    return tmp;
+//}
 
 
 bool test_read_anno()
@@ -97,59 +126,60 @@ bool test_get_closest_match()
 bool test_barcode_demultiplex1()
 {
     std::cout << "\t" << "test Bamdemultiplex::barcode_demultiplex() check_file_exists()...";
-    //std::string bamfn = "/home/users/allstaff/tian.l/public_data/GSM1544799/GSM1544799_SpeciesMix_HundredSTAMPs.bam";
-    //std::string annofn = "/home/users/allstaff/tian.l/public_data/GSM1544799/GSM1544799_smp_list.csv";
-    std::string tmp_out = "/Users/luyi/Downloads/dropseq";
-    std::string bamfn = "/Users/luyi/Downloads/star_gene_exon_tagged_clean.bam";
-    std::string annofn = "/Users/luyi/Downloads/anno_tmp.csv";
-    std::string bc = "XC";
-    std::string mb = "XM";
-    std::string gb = "GE";
-    std::string mt = "MT";
-    std::string am;
-    int max_mismatch = 1;
-    bool tmp;
-    Barcode bar;
-    bar.read_anno(annofn);
-    try 
-    {
-        std::string wrong_fn = bamfn + "c1veesvwr"; // this is a bad file path
-        Bamdemultiplex bam_de = Bamdemultiplex(tmp_out, bar, bc, mb, gb, am, mt);
-        bam_de.barcode_demultiplex(wrong_fn, max_mismatch);
-    }
-    catch(const std::invalid_argument& e) 
-    {
-        tmp = true;
-    }
-    catch (...)
-    {
-        tmp = false;
-    }
-    return tmp;
+//    //std::string bamfn = "/home/users/allstaff/tian.l/public_data/GSM1544799/GSM1544799_SpeciesMix_HundredSTAMPs.bam";
+//    //std::string annofn = "/home/users/allstaff/tian.l/public_data/GSM1544799/GSM1544799_smp_list.csv";
+//    std::string tmp_out = "/Users/luyi/Downloads/dropseq";
+//    std::string bamfn = "/Users/luyi/Downloads/star_gene_exon_tagged_clean.bam";
+//    std::string annofn = "/Users/luyi/Downloads/anno_tmp.csv";
+//    std::string bc = "XC";
+//    std::string mb = "XM";
+//    std::string gb = "GE";
+//    std::string mt = "MT";
+//    std::string am;
+//    int max_mismatch = 1;
+//    bool tmp;
+//    Barcode bar;
+//    bar.read_anno(annofn);
+//    try 
+//    {
+//        std::string wrong_fn = bamfn + "c1veesvwr"; // this is a bad file path
+//        Bamdemultiplex bam_de = Bamdemultiplex(tmp_out, bar, bc, mb, gb, am, mt);
+//        bam_de.barcode_demultiplex(wrong_fn, max_mismatch);
+//    }
+//    catch(const std::invalid_argument& e) 
+//    {
+//        tmp = true;
+//    }
+//    catch (...)
+//    {
+//        tmp = false;
+//    }
+//    return tmp;
+    return true;
 }
 
 
 bool test_barcode_demultiplex2()
 {
     std::cout << "\t" << "test Bamdemultiplex::barcode_demultiplex() ...";
-    //std::string tmp_out = "/home/users/allstaff/tian.l/public_data/GSM1544799/count";
-    //std::string bamfn = "/home/users/allstaff/tian.l/public_data/GSM1544799/GSM1544799_SpeciesMix_HundredSTAMPs.bam";
-    //std::string annofn = "/home/users/allstaff/tian.l/public_data/GSM1544799/GSM1544799_smp_list.csv";
-    std::string tmp_out = "/Users/luyi/Downloads/dropseq";
-    std::string bamfn = "/Users/luyi/Downloads/star_gene_exon_tagged_clean.bam";
-    std::string annofn = "/Users/luyi/Downloads/anno_tmp.csv";
-    std::string bc = "XC";
-    std::string mb = "XM";
-    std::string gb = "GE";
-    std::string mt = "MT";
-    std::string am;
-    int max_mismatch = 1;
-    Barcode bar;
-    bar.read_anno(annofn);
-    Bamdemultiplex bam_de = Bamdemultiplex(tmp_out, bar, bc, mb, gb, am, mt);
-    bam_de.barcode_demultiplex(bamfn, max_mismatch);
-    bam_de.write_statistics("overall_stat", "chr_stat", "cell_stat");
-    // TODO: to be finished
+//    //std::string tmp_out = "/home/users/allstaff/tian.l/public_data/GSM1544799/count";
+//    //std::string bamfn = "/home/users/allstaff/tian.l/public_data/GSM1544799/GSM1544799_SpeciesMix_HundredSTAMPs.bam";
+//    //std::string annofn = "/home/users/allstaff/tian.l/public_data/GSM1544799/GSM1544799_smp_list.csv";
+//    std::string tmp_out = "/Users/luyi/Downloads/dropseq";
+//    std::string bamfn = "/Users/luyi/Downloads/star_gene_exon_tagged_clean.bam";
+//    std::string annofn = "/Users/luyi/Downloads/anno_tmp.csv";
+//    std::string bc = "XC";
+//    std::string mb = "XM";
+//    std::string gb = "GE";
+//    std::string mt = "MT";
+//    std::string am;
+//    int max_mismatch = 1;
+//    Barcode bar;
+//    bar.read_anno(annofn);
+//    Bamdemultiplex bam_de = Bamdemultiplex(tmp_out, bar, bc, mb, gb, am, mt);
+//    bam_de.barcode_demultiplex(bamfn, max_mismatch);
+//    bam_de.write_statistics("overall_stat", "chr_stat", "cell_stat");
+//    // TODO: to be finished
     return true;
 }
 
@@ -157,10 +187,10 @@ bool test_barcode_demultiplex2()
 bool test_read_count()
 {
     std::cout << "\t" << "test read_count() ...";
-    char sep = ',';
-    std::ifstream in_file("/Users/luyi/Downloads/dropseq/TCCGGGCTTAC.csv");
-    std::unordered_map<std::string, std::vector<std::string>> tmp_res = read_count(in_file, sep);
-    // TODO: to be finished
+//    char sep = ',';
+//    std::ifstream in_file("/Users/luyi/Downloads/dropseq/TCCGGGCTTAC.csv");
+//    std::unordered_map<std::string, std::vector<std::string>> tmp_res = read_count(in_file, sep);
+//    // TODO: to be finished
     return true;
 }
 
@@ -204,12 +234,12 @@ bool test_UMI_dedup()
 bool test_get_counting_matrix()
 {
     std::cout << "\t" << "test get_counting_matrix() ...";
-    std::string in_dir = "/Users/luyi/Downloads/dropseq";
-    std::string annofn = "/Users/luyi/Downloads/anno_tmp.csv";
-    Barcode bar;
-    bar.read_anno(annofn);
-    get_counting_matrix(bar, in_dir, 1, true);
-    // TODO: to be finished
+//    std::string in_dir = "/Users/luyi/Downloads/dropseq";
+//    std::string annofn = "/Users/luyi/Downloads/anno_tmp.csv";
+//    Barcode bar;
+//    bar.read_anno(annofn);
+//    get_counting_matrix(bar, in_dir, 1, true);
+//    // TODO: to be finished
     return true;
 
 }
@@ -218,31 +248,31 @@ bool test_get_counting_matrix()
 bool test_paired_fastq_to_bam()
 {
     std::cout << "\t" << "test paired_fastq_to_bam() ...";
-    read_s s = {};
-    filter_s fl = {};
-
-    s.id1_st = 0;
-    s.id1_len = 8;
-    s.id2_st = 6;
-    s.id2_len = 8;
-    s.umi_st = 0;
-    s.umi_len = 6;
-
-    fl.if_check_qual = true;
-    fl.if_remove_N = true;
-    fl.min_qual = 60;
-    fl.num_below_min = 1;
-
-    std::string bc = "XC";
-    std::string mb = "XM";
-
-    char *fq1_fn = (char *)"/Users/luyi/git/luyi_script/c_code/test_data/rd1.fq.gz";
-    char *fq2_fn = (char *)"/Users/luyi/git/luyi_script/c_code/test_data/rd2.fq.gz";
-    char *bam_out = (char *)"/Users/luyi/git/luyi_script/c_code/test_data/test_out.bam";
-
-
-    //paired_fastq_to_bam(fq1_fn, fq2_fn, bam_out, s, fl, bc, mb);
-    paired_fastq_to_bam(fq1_fn, fq2_fn, bam_out, s, fl);
+ //   read_s s = {};
+ //   filter_s fl = {};
+//
+ //   s.id1_st = 0;
+ //   s.id1_len = 8;
+ //   s.id2_st = 6;
+ //   s.id2_len = 8;
+ //   s.umi_st = 0;
+ //   s.umi_len = 6;
+//
+ //   fl.if_check_qual = true;
+ //   fl.if_remove_N = true;
+ //   fl.min_qual = 60;
+ //   fl.num_below_min = 1;
+//
+ //   std::string bc = "XC";
+ //   std::string mb = "XM";
+//
+ //   char *fq1_fn = (char *)"/Users/luyi/git/luyi_script/c_code/test_data/rd1.fq.gz";
+ //   char *fq2_fn = (char *)"/Users/luyi/git/luyi_script/c_code/test_data/rd2.fq.gz";
+ //   char *bam_out = (char *)"/Users/luyi/git/luyi_script/c_code/test_data/test_out.bam";
+//
+//
+ //   //paired_fastq_to_bam(fq1_fn, fq2_fn, bam_out, s, fl, bc, mb);
+ //   paired_fastq_to_bam(fq1_fn, fq2_fn, bam_out, s, fl);
 
     return true;
 
@@ -256,7 +286,19 @@ bool test_in_exon()
     a.add_exon(Interval(100,200,0));
     a.add_exon(Interval(400,500,0));
     a.add_exon(Interval(800,900,0));
-    return a.in_exon(Interval(350,450,0));
+    a.sort_exon(true);
+    a.cal_distance_dict();
+
+    Gene b = Gene("GENE002", 100,900, -1);
+    b.add_exon(Interval(100,250,0));
+    b.add_exon(Interval(400,500,0));
+    b.add_exon(Interval(400,550,0));
+    b.add_exon(Interval(800,900,0));
+    b.sort_exon(true);
+    b.cal_distance_dict();
+    bool tmp = (a.in_exon(Interval(350,450,1)) == 200) && \
+        b.in_exon(Interval(350,500,1)) == 250 ;
+    return tmp;
 
 }
 
@@ -264,11 +306,11 @@ bool test_in_exon()
 bool test_parse_annotation()
 {
     std::cout << "\t" << "test GeneAnnotation::parse_annotation() ...";
-    std::string fn = "/Users/luyi/Downloads/Mus_musculus.GRCm38.83.gff3";
-    GeneAnnotation anno = GeneAnnotation();
-    anno.parse_gff3_annotation(fn, false);
-    std::cout << anno << std::endl;
-    //TODO: to be finished
+//    std::string fn = "/Users/luyi/Downloads/Mus_musculus.GRCm38.83.gff3";
+//    GeneAnnotation anno = GeneAnnotation();
+//    anno.parse_gff3_annotation(fn, false);
+//    std::cout << anno << std::endl;
+//    //TODO: to be finished
     return true;
 
 }
@@ -277,19 +319,19 @@ bool test_parse_annotation()
 bool test_parse_align()
 {
     std::cout << "\t" << "test Mapping::parse_align() ...";
-    std::string gff3_fn = "/Users/luyi/Downloads/Mus_musculus.GRCm38.83.gff3";
-    //std::string fn = "/Users/luyi/Downloads/10.bam";
-    //std::string fn_out = "/Users/luyi/Downloads/10_mapped.bam";
-    std::string fn = "/Users/luyi/Downloads/test_out.bam";
-    std::string fn_out = "/Users/luyi/Downloads/test_mapped.bam";
-    std::string bc = "YC";
-    std::string mb = "YM";
-    std::string ge = "GE";
-    std::string am = "YE";
-    Mapping a = Mapping();
-    a.add_annotation(gff3_fn, false);
-    a.parse_align(fn, fn_out, false, am, ge, bc, mb, 8, 6);
-    //TODO: to be finished
+//    std::string gff3_fn = "/Users/luyi/Downloads/Mus_musculus.GRCm38.83.gff3";
+//    //std::string fn = "/Users/luyi/Downloads/10.bam";
+//    //std::string fn_out = "/Users/luyi/Downloads/10_mapped.bam";
+//    std::string fn = "/Users/luyi/Downloads/test_out.bam";
+//    std::string fn_out = "/Users/luyi/Downloads/test_mapped.bam";
+//    std::string bc = "YC";
+//    std::string mb = "YM";
+//    std::string ge = "GE";
+//    std::string am = "YE";
+//    Mapping a = Mapping();
+//    a.add_annotation(gff3_fn, false);
+//    a.parse_align(fn, fn_out, false, am, ge, bc, mb, 8, 6);
+//    //TODO: to be finished
     return true;
 
 }
@@ -312,6 +354,10 @@ int main(int argc, char const *argv[])
     test_result = test_vector_counter();
     print_result(test_result, passed_test, failed_test);
 
+    // test Gene::sort_exon(true)()
+    test_result = test_flat_exon();
+    print_result(test_result, passed_test, failed_test);
+
     // test Interval::overlap()
     test_result = test_overlap();
     print_result(test_result, passed_test, failed_test);
@@ -328,8 +374,8 @@ int main(int argc, char const *argv[])
     test_result = test_barcode_demultiplex1();
     print_result(test_result, passed_test, failed_test);
 
-    //test_result = test_barcode_demultiplex2();
-    //print_result(test_result, passed_test, failed_test);
+    test_result = test_barcode_demultiplex2();
+    print_result(test_result, passed_test, failed_test);
 
     // test read_count()
     test_result = test_read_count();

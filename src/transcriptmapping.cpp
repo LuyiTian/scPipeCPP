@@ -30,65 +30,135 @@ void Gene::add_exon(Interval it)
         }
 }
 
-int Gene::distance_to_end(Interval it)
+//int Gene::distance_to_end(Interval it)
+//{
+//    int distance = 0;
+//    int tmp_en = 0;
+//    auto iter = std::lower_bound(exon_vec.begin(), exon_vec.end(), it);
+//    if (snd == 1)
+//    {
+//        distance += iter->en - ((iter->st)>it.st?(iter->st):it.st);
+//        tmp_en = iter->en;
+//        for (auto i = iter+1; i != exon_vec.end(); ++i)
+//        {
+//            if (tmp_en < i->st)
+//            {
+//                distance += i->en - i->st;
+//                tmp_en = i->en;
+//            }
+//
+  //      }
+//
+  //  }
+  //  else if (snd == -1)
+  //  {
+  //      for (auto i = exon_vec.begin(); i != iter; ++i)
+  //      {
+  //          if (tmp_en < i->st)
+  //          {
+  //              distance += i->en - i->st;
+  //              tmp_en = i->en;
+  //          }
+  //      }
+  //      if (tmp_en < iter->st)
+  //      {
+//            distance += ((iter->en)<it.en?(iter->en):it.en) - iter->st;
+//        }
+//    }
+//
+//    return distance;
+//}
+
+
+void Gene::cal_distance_dict()
 {
-    int distance = 0;
-    int tmp_en = 0;
-    auto iter = std::lower_bound(exon_vec.begin(), exon_vec.end(), it);
-    if (snd == 1)
+    int csum = 0;
+    if(snd == -1)
     {
-        distance += iter->en - ((iter->st)>it.st?(iter->st):it.st);
-        tmp_en = iter->en;
-        for (auto i = iter+1; i != exon_vec.end(); ++i)
+        for (auto i = exon_vec.begin(); i != exon_vec.end(); ++i)
         {
-            if (tmp_en < i->st)
-            {
-                distance += i->en - i->st;
-                tmp_en = i->en;
-            }
-
+            csum_dist.push_back(csum);
+            csum += i->en - i->st;
         }
-
-    }
-    else if (snd == -1)
-    {
-        for (auto i = exon_vec.begin(); i != iter; ++i)
-        {
-            if (tmp_en < i->st)
-            {
-                distance += i->en - i->st;
-                tmp_en = i->en;
-            }
-        }
-        if (tmp_en < iter->st)
-        {
-            distance += ((iter->en)<it.en?(iter->en):it.en) - iter->st;
-        }
-    }
-
-    return distance;
-}
-
-bool Gene::in_exon(Interval it)
-{
-    return std::binary_search(exon_vec.begin(), exon_vec.end(), it);
-}
-
-bool Gene::in_exon(Interval it, bool check_strand)
-{
-    if (check_strand && (it.snd*snd == -1))
-    {
-        return false;
     }
     else
     {
-        return std::binary_search(exon_vec.begin(), exon_vec.end(), it);
+        for (auto ri = exon_vec.rbegin(); ri!= exon_vec.rend(); ++ri) // reverse
+        {
+            csum_dist.push_back(csum);
+            csum += ri->en - ri->st;
+        }
+        std::reverse(csum_dist.begin(),csum_dist.end()); // reverse the dist
     }
 }
 
-void Gene::sort_exon()
+
+int Gene::in_exon(Interval it)
+{
+    auto iter = std::equal_range(exon_vec.begin(), exon_vec.end(), it);
+    int ret = -1; // return -1 if not in exon
+    if ((iter.second-iter.first) > 0)
+    {
+        if (snd == -1) // reverse strand
+        {
+            ret = it.en<((iter.second-1)->en) ? it.en:(iter.second-1)->en;
+            ret = csum_dist[iter.second-exon_vec.begin()-1]+ret-(iter.second-1)->st;
+        }
+        else
+        {
+            ret = it.st>(iter.first->st) ? it.st:(iter.first->st);
+            ret = (iter.first->en) - ret + csum_dist[iter.first-exon_vec.begin()];
+        }
+    }
+    return ret;
+}
+
+int Gene::in_exon(Interval it, bool check_strand)
+{
+    if (check_strand && (it.snd*snd == -1))
+    {
+        return -1; // if not the same strand, return -1
+    }
+    else
+    {
+        return in_exon(it);
+    }
+}
+
+void Gene::sort_exon(bool flat_exon)
 {
     std::sort(exon_vec.begin(), exon_vec.end());
+    std::vector<Interval> new_exon;
+    int new_st, new_en;
+    if(flat_exon)
+    {
+        for (auto i = exon_vec.begin(); i != exon_vec.end(); ++i)
+        {
+            if (new_exon.size() == 0)
+            {
+                new_exon.push_back(*i);
+            }
+            else
+            {
+                if (i->st < new_exon.back().en)
+                {
+                    new_st = new_exon.back().st<(i->st) ? new_exon.back().st:(i->st);
+                    new_en = new_exon.back().en>(i->en) ? new_exon.back().en:(i->en);
+                    new_exon.pop_back();
+                    new_exon.push_back(Interval(new_st, new_en, i->snd));
+                }
+                else
+                {
+                    new_exon.push_back(*i);
+                }
+            }
+        }
+        if(exon_vec.back().st > new_exon.back().en)
+        {
+            new_exon.push_back(exon_vec.back());
+        }
+        exon_vec = new_exon;
+    }
 }
 
 std::ostream& operator<< (std::ostream& out, const Gene& obj)
@@ -232,18 +302,9 @@ void GeneAnnotation::parse_gff3_annotation(string gff3_fn, bool fix_chrname)
         }
 
     }
-
-    for (auto iter : tmp_gene_dict)
-    {
-        for (auto sub_iter : iter.second)
-        {
-            sub_iter.second.sort_exon();
-            gene_dict[iter.first].push_back(sub_iter.second);
-        }
-        std::sort(gene_dict[iter.first].begin(), gene_dict[iter.first].end());
-    }
-
+    sort_annotation(tmp_gene_dict);
 }
+
 
 void GeneAnnotation::parse_bed_annotation(string bed_fn, bool fix_chrname)
 {
@@ -269,22 +330,45 @@ void GeneAnnotation::parse_bed_annotation(string bed_fn, bool fix_chrname)
             tmp_gene_dict[token[1]][token[0]].add_exon(Interval(std::atoi(token[2].c_str()), std::atoi(token[3].c_str()), strand));
             tmp_gene_dict[token[1]][token[0]].set_ID(token[0]);
         }
-
     }
+    sort_annotation(tmp_gene_dict);
+}
 
+
+void GeneAnnotation::sort_annotation(std::unordered_map<string, std::unordered_map<string, Gene>>& tmp_gene_dict)
+{
+    int max_bin;
+    std::vector<int> tmp_idx;
     for (auto iter : tmp_gene_dict)
     {
         for (auto sub_iter : iter.second)
         {
             if (sub_iter.second.exon_vec.size()>1)
             {
-                sub_iter.second.sort_exon();
+                sub_iter.second.sort_exon(true);
             }
+            sub_iter.second.cal_distance_dict();
             gene_dict[iter.first].push_back(sub_iter.second);
         }
         if (gene_dict[iter.first].size()>1)
         {
-            std::sort(gene_dict[iter.first].begin(), gene_dict[iter.first].end());
+            std::sort(gene_dict[iter.first].begin(), gene_dict[iter.first].end(),[](Gene a, Gene b) {
+                        return a.st < b.st;   
+                    });
+        }
+        max_bin = (int) floor(gene_dict[iter.first].back().exon_vec.back().en/BIN_SIZE);
+        for (int i=0; i<=max_bin; i++)
+        {
+            std::vector<int> tmp_idx;
+            auto upper = std::upper_bound(gene_dict[iter.first].begin(), gene_dict[iter.first].end(), Interval(i*BIN_SIZE,(i+1)*BIN_SIZE+100));
+            for (auto it=gene_dict[iter.first].begin();it<upper; it++)
+            {
+                if (it->overlap(i*BIN_SIZE,(i+1)*BIN_SIZE+100) == 0)
+                {
+                    tmp_idx.push_back(it-gene_dict[iter.first].begin());
+                }
+            }
+            bins_dict[iter.first].push_back(tmp_idx);
         }
     }
 }
@@ -360,6 +444,9 @@ int Mapping::map_exon(bam_hdr_t *header, bam1_t *b, string& gene_id, bool m_stra
     int tmp_pos = b->core.pos;
     int tmp_rest = 9999999; // distance to end pos
     int tmp_ret;
+    int tmp_inexon;
+    int gene_idx;
+    int bin1;
     string tmp_id;
     gene_id = "";
 
@@ -371,21 +458,28 @@ int Mapping::map_exon(bam_hdr_t *header, bam1_t *b, string& gene_id, bool m_stra
         if (((bam_cigar_type(cig[c]) >> 0) & 1) && ((bam_cigar_type(cig[c]) >> 1) & 1))
         {
             Interval it = Interval(tmp_pos, tmp_pos+bam_cigar_oplen(cig[c]), rev);
-            auto iter = std::equal_range(Anno.gene_dict[header->target_name[b->core.tid]].begin(), Anno.gene_dict[header->target_name[b->core.tid]].end(), it);
-            if ((iter.second - iter.first) == 0)
+            bin1 = (int) floor(it.st/BIN_SIZE);
+            
+            if (Anno.bins_dict[header->target_name[b->core.tid]][bin1].size() == 0)
+            {
+                tmp_ret = tmp_ret>3?3:tmp_ret;
+            }
+            else if (Anno.bins_dict[header->target_name[b->core.tid]].size()<=bin1)
             {
                 tmp_ret = tmp_ret>3?3:tmp_ret;
             }
             else
             {
                 tmp_id = "";
-                for (auto i = iter.first; i < iter.second; ++i)
+                for (int i = 0; i < Anno.bins_dict[header->target_name[b->core.tid]][bin1].size(); ++i)
                 {
-                    if (i->in_exon(it, m_strand))
+                    gene_idx = Anno.bins_dict[header->target_name[b->core.tid]][bin1][i];
+                    tmp_inexon = Anno.gene_dict[header->target_name[b->core.tid]][gene_idx].in_exon(it, m_strand);
+                    if (tmp_inexon > -1)
                     {
                         if (tmp_id != "")
                         {
-                            if (tmp_id != i->gene_id)
+                            if (tmp_id != Anno.gene_dict[header->target_name[b->core.tid]][gene_idx].gene_id)
                             {
                                 tmp_ret = 1; // ambiguous mapping
                                 break;
@@ -393,19 +487,24 @@ int Mapping::map_exon(bam_hdr_t *header, bam1_t *b, string& gene_id, bool m_stra
                             else
                             {
                                 // update the distance to end pos
-                                tmp_rest = tmp_rest<(i->distance_to_end(it))?tmp_rest:i->distance_to_end(it);
+                                tmp_rest = tmp_rest>tmp_inexon ? tmp_rest:tmp_inexon;
                             }
                         }
                         else
                         {
-                            tmp_id = i->gene_id;
+                            tmp_id = Anno.gene_dict[header->target_name[b->core.tid]][gene_idx].gene_id;
                             tmp_ret = 0;
-                            tmp_rest = i->distance_to_end(it);
+                            tmp_rest = tmp_inexon;
                         }
                     }
-                    else if ((it > *i) || (it < *i))
+                    else if (it > Anno.gene_dict[header->target_name[b->core.tid]][gene_idx])
                     {
                         tmp_ret = tmp_ret>=3?3:tmp_ret;
+                    }
+                    else if(it < Anno.gene_dict[header->target_name[b->core.tid]][gene_idx])
+                    {
+                        tmp_ret = tmp_ret>=3?3:tmp_ret;
+                        break;
                     }
                     else
                     {

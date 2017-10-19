@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <vector>
+#include <utility>
 #include <cstring>
 #include "config_hts.h"
 #include "utils.h"
@@ -13,6 +14,7 @@
 #ifndef TRANSCRIPTMAPPING_H
 #define TRANSCRIPTMAPPING_H
 
+#define BIN_SIZE 50000
 
 // for position, we dont store chromosome info because we will put genes from the same chromosome
 // together in a hashmap
@@ -21,6 +23,7 @@ class Gene: public Interval
 public:
     std::string gene_id;
     std::vector<Interval> exon_vec;
+    std::vector<int> csum_dist;
 
     Gene(std::string id, int st, int en, int snd);
     Gene(std::string id, int snd);
@@ -30,11 +33,17 @@ public:
 
     void add_exon(Interval it);
 
-    bool in_exon(Interval it);
-    bool in_exon(Interval it, bool check_strand);
+    // if the segment is not in any exon return -1. otherwise return
+    // the farest distance to the 3' end. for genes in forward strand
+    // it will the end of last exon.
+    int in_exon(Interval it);
+    int in_exon(Interval it, bool check_strand);
 
-    int distance_to_end(Interval it);
-    void sort_exon();
+    //int distance_to_end(Interval it);
+    void sort_exon(bool flat_exon);
+
+    // note: this should be run after sort_exon with flat_exon=true
+    void cal_distance_dict();
 
     friend std::ostream& operator<< (std::ostream& out, const Gene& obj);
     
@@ -45,7 +54,7 @@ class GeneAnnotation
 {
 public:
     std::unordered_map<std::string, std::vector<Gene>> gene_dict;
-
+    std::unordered_map<std::string, std::vector<std::vector<int>>> bins_dict;
     std::string get_ID(std::string tok);
 
     std::string get_parent(std::string tok);
@@ -77,6 +86,7 @@ public:
     // 11. blockSizes - A comma-separated list of the block sizes. The number of items in this list should correspond to blockCount.
     // 12. blockStarts - A comma-separated list of block starts. All of the blockStart positions should be calculated relative to chromStart. The number of items in this list should correspond to blockCount.
     void parse_bed_annotation(std::string bed_fn, bool fix_chrname);
+    void sort_annotation(std::unordered_map<std::string, std::unordered_map<std::string, Gene>>& tmp_gene_dict);
 
     friend std::ostream& operator<< (std::ostream& out, const GeneAnnotation& obj); 
 
