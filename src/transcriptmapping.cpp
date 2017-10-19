@@ -356,7 +356,7 @@ void GeneAnnotation::sort_annotation(std::unordered_map<string, std::unordered_m
                         return a.st < b.st;   
                     });
         }
-        max_bin = (int) floor(gene_dict[iter.first].back().exon_vec.back().en/BIN_SIZE);
+        max_bin = (int) std::floor(gene_dict[iter.first].back().exon_vec.back().en/BIN_SIZE);
         for (int i=0; i<=max_bin; i++)
         {
             std::vector<int> tmp_idx;
@@ -458,8 +458,8 @@ int Mapping::map_exon(bam_hdr_t *header, bam1_t *b, string& gene_id, bool m_stra
         if (((bam_cigar_type(cig[c]) >> 0) & 1) && ((bam_cigar_type(cig[c]) >> 1) & 1))
         {
             Interval it = Interval(tmp_pos, tmp_pos+bam_cigar_oplen(cig[c]), rev);
-            bin1 = (int) floor(it.st/BIN_SIZE);
-            
+            bin1 = (int) std::floor(it.st/BIN_SIZE);
+
             if (Anno.bins_dict[header->target_name[b->core.tid]][bin1].size() == 0)
             {
                 tmp_ret = tmp_ret>3?3:tmp_ret;
