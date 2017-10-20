@@ -8,7 +8,9 @@
 #include <cmath>
 #include <vector>
 #include <utility>
+#include <atomic> // for pp
 #include <cstring>
+#include "concurrentqueue.h"
 #include "config_hts.h"
 #include "utils.h"
 
@@ -16,6 +18,7 @@
 #define TRANSCRIPTMAPPING_H
 
 #define BIN_SIZE 50000
+#define MAX_QUEUE_SIZE 100000
 
 // for position, we dont store chromosome info because we will put genes from the same chromosome
 // together in a hashmap
@@ -113,6 +116,8 @@ public:
     // @param: 
     void parse_align(std::string fn, std::string fn_out, bool m_strand, std::string map_tag, std::string gene_tag, std::string cellular_tag, std::string molecular_tag, int bc_len, int UMI_len);
 
+    // multi thread version of parse_align
+    void parse_align_pp(std::string fn, std::string fn_out, bool m_strand, std::string map_tag, std::string gene_tag, std::string cellular_tag, std::string molecular_tag, int bc_len, int UMI_len, int num_thread);
     /* data */
 };
 

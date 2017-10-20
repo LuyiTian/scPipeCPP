@@ -566,7 +566,6 @@ void Mapping::parse_align(string fn, string fn_out, bool m_strand, string map_ta
     int tmp_c[4] = {0,0,0,0};
 
     bool found_any = false;
-    #pragma omp parallel for
     for (int i = 0; i < header->n_targets; ++i)
     {
         if (Anno.gene_dict.end() == Anno.gene_dict.find(header->target_name[i]))
@@ -650,6 +649,200 @@ void Mapping::parse_align(string fn, string fn_out, bool m_strand, string map_ta
             std::cout << "return code: " << re << std::endl;
             exit(EXIT_FAILURE);
         }
+    }
+
+    std::cout << "\t" << "unique map to exon:" << tmp_c[0] << std::endl;
+    std::cout << "\t" << "ambiguous map to multiple exon:" << tmp_c[1] << std::endl;
+    std::cout << "\t" << "map to intron:" << tmp_c[2] << std::endl;
+    std::cout << "\t" << "not mapped:" << tmp_c[3] << std::endl;
+    std::cout << "\t" << "unaligned:" << unaligned << std::endl;
+    sam_close(of);
+    bgzf_close(fp);
+}
+
+
+void Mapping::parse_align_pp(string fn, string fn_out, bool m_strand, string map_tag, string gene_tag, string cellular_tag, string molecular_tag, int bc_len, int UMI_len, int num_thread)
+{
+    int unaligned = 0;
+
+    check_file_exists(fn); // htslib does not check if file exist so we do it manually
+
+    // open files
+    BGZF *fp = bgzf_open(fn.c_str(), "r"); // input file
+    samFile *of = sam_open(fn_out.c_str(), "wb"); // output file
+
+    bam_hdr_t *header = bam_hdr_read(fp);
+    sam_hdr_write(of, header);
+
+    // PP
+    moodycamel::ConcurrentQueue<bam1_t> in_q;
+    moodycamel::ConcurrentQueue<bam1_t> out_q;
+
+    std::atomic<int> done_read(0);
+    std::atomic<int> done_map(0);
+    std::atomic<int> done_write(0);
+
+    const int read_num = 1; // dont know if htslib bam IO is thread safe, so just use one
+    const int write_num = 1;
+
+    std::thread reader[read_num];
+    std::thread mapper[num_thread];
+    std::thread writer[write_num];
+
+    int tmp_c[4] = {0,0,0,0};
+
+    bool found_any = false;
+    for (int i = 0; i < header->n_targets; ++i)
+    {
+        if (Anno.gene_dict.end() == Anno.gene_dict.find(header->target_name[i]))
+        {
+            std::cout << header->target_name[i] << " not found in exon annotation." << std::endl;
+        }
+        else
+        {
+            found_any = true;
+        }
+
+    }
+    if (!found_any)
+    {
+        std::cout << "ERROR: The annotation and .bam file contains different chromosome." << std::endl;
+        exit(1);
+    }
+    // for moving barcode and UMI from sequence name to bam tags
+    const char * g_ptr = gene_tag.c_str();
+    const char * c_ptr = cellular_tag.c_str();
+    const char * m_ptr = molecular_tag.c_str();
+    const char * a_ptr = map_tag.c_str();
+    char buf[999] = ""; // assume the length of barcode or UMI is less than 999
+    int cnt = 1;
+
+    // define the bam reader
+    for (int i = 0; i != read_num; ++i) {
+        reader[i] = std::thread([&]() {
+            bam1_t *b = bam_init1();
+            int tmp_rd_bam;
+            while (true) {
+                if(in_q.size_approx() > MAX_QUEUE_SIZE)
+                {
+                    continue;
+                }
+                tmp_rd_bam = bam_read1(fp, b);
+                if (tmp_rd_bam<0)
+                {
+                    break;
+                }
+                in_q.enqueue(*bam_dup1(b));
+            }
+            done_read.fetch_add(1, std::memory_order_release);
+        });
+    }
+
+    // define the mapper
+    for (int i = 0; i != num_thread; ++i) {
+        mapper[i] = std::thread([&]() {
+            // per thread variable
+            bam1_t *b = bam_init1();
+            int ret;
+            string gene_id;
+            bool itemsLeft=true;
+            do {
+                if(out_q.size_approx() > MAX_QUEUE_SIZE)
+                {
+                    continue;
+                }
+                // It's important to fence (if the producers have finished) *before* dequeueing
+                itemsLeft = done_read.load(std::memory_order_acquire) != read_num;
+                while (in_q.try_dequeue(b)) 
+                {
+                    itemsLeft = true;
+                    if ((b->core.flag&BAM_FUNMAP) > 0)
+                    {
+                        unaligned++;
+                        ret = 4;
+                    }
+                    else
+                    {
+                        //  chromosome not found in annotation:
+                        if (Anno.gene_dict.end() == Anno.gene_dict.find(header->target_name[b->core.tid]))
+                        {
+                            ret = 3;
+                        }
+                        else
+                        {
+                            ret = map_exon(header, b, gene_id, m_strand);
+                        }
+                        if (ret <= 0)
+                        {
+                            tmp_c[0]++;
+                            bam_aux_append(b, g_ptr, 'Z', gene_id.size()+1, (uint8_t*)gene_id.c_str());
+                        }
+                        else
+                        {
+                            tmp_c[ret]++;
+                        }
+                    }
+                    if (bc_len > 0)
+                    {
+                        memcpy(buf, bam_get_qname(b), bc_len * sizeof(char));
+                        buf[bc_len] = '\0';
+                        bam_aux_append(b, c_ptr, 'Z', bc_len+1, (uint8_t*)buf);
+                    }
+                    if (UMI_len > 0)
+                    {
+                        memcpy(buf, bam_get_qname(b)+bc_len+1, UMI_len * sizeof(char)); // `+1` to add separator
+                        buf[UMI_len] = '\0';
+                        bam_aux_append(b, m_ptr, 'Z', UMI_len+1, (uint8_t*)buf);
+                    }
+
+                    bam_aux_append(b, a_ptr, 'i', sizeof(uint32_t), (uint8_t*)&ret);
+                    out_q.enqueue(*bam_dup1(b));
+
+                }
+            } while (itemsLeft || done_map.fetch_add(1, std::memory_order_acq_rel) + 1 == num_thread);
+            // The condition above is a bit tricky, but it's necessary to ensure that the
+            // last consumer sees the memory effects of all the other consumers before it
+            // calls try_dequeue for the last time
+        });
+    }
+
+    
+    for (int i = 0; i != write_num; ++i) 
+    {
+        reader[i] = std::thread([&]() {
+            bam1_t *b = bam_init1();
+            bool itemsLeft=true;
+            int tmp_wrt_bam;
+            do 
+            {
+                itemsLeft = done_map.load(std::memory_order_acquire) != num_thread;
+                while (out_q.try_dequeue(b))
+                {
+                    tmp_wrt_bam = sam_write1(of, header, b);
+                    if (tmp_wrt_bam < 0)
+                    {
+                        std::cout << "fail to write the bam file: " << bam_get_qname(b) << std::endl;
+                        std::cout << "return code: " << tmp_wrt_bam << std::endl;
+                        exit(EXIT_FAILURE);
+                    }
+                }
+            } while (itemsLeft);
+            done_write.fetch_add(1, std::memory_order_release);
+        });
+    }
+
+
+    for (int i = 0; i != read_num; ++i) 
+    {
+        reader[i].join();
+    }
+    for (int i = 0; i != num_thread; ++i) 
+    {
+        mapper[i].join();
+    }
+    for (int i = 0; i != write_num; ++i) 
+    {
+        writer[i].join();
     }
 
     std::cout << "\t" << "unique map to exon:" << tmp_c[0] << std::endl;
