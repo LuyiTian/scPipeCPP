@@ -14,6 +14,7 @@ int main(int argc, char* argv[]) {
             "\t-S <surfix> the surfix added in cell name (default: `CELL_`)\n"<<\
             "\t-R <max_reads> the maximum number of reads processed (default: 1000000)\n"<<\
             "\t-N <min_count> barcode that have smaller count will be discarded (default: 10)\n"<<\
+            "\t-B <min_bc> maximum number of cell barcodes allowed, set to negative if no restriction (default: -1)\n"<<\
             "\t-M <max_mismatch> maximum mismatch allowed when merging barcode (default: 1)\n";
 
         exit(0);
@@ -26,6 +27,7 @@ int main(int argc, char* argv[]) {
         int bc_len = 0;
         int max_reads = 1000000;
         int min_count = 10;
+        int max_bc = -1;
         for (int i = 1; i < argc; i++) 
         {
             std::string arg = argv[i];
@@ -60,6 +62,10 @@ int main(int argc, char* argv[]) {
                 {
                     max_mismatch = std::atoi(argv[i + 1]);
                 }
+                else if (arg == "-B")
+                {
+                    max_bc = std::atoi(argv[i + 1]);
+                }
             }
         }
         std::cout << "######### detect barcode:" << std::endl;
@@ -70,9 +76,10 @@ int main(int argc, char* argv[]) {
         std::cout << "\t" << "max reads: " << max_reads << std::endl;
         std::cout << "\t" << "min count: " << min_count << std::endl;
         std::cout << "\t" << "max mismatch " << max_mismatch << std::endl;
+        std::cout << "\t" << "max cells " << max_bc << std::endl;
 
         std::unordered_map<std::string, int> counter = summarize_barcode(infq, bc_len, max_reads, max_mismatch, min_count);
-        write_barcode_summary(outcsv, surfix, counter);
+        write_barcode_summary(outcsv, surfix, counter, max_bc);
         return 0;
     }
 }

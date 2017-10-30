@@ -96,15 +96,27 @@ std::unordered_map<std::string, int> summarize_barcode(std::string fn, int bc_le
     return counter;
 }
 
-void write_barcode_summary(std::string outfn, std::string surfix, std::unordered_map<std::string, int> counter)
+void write_barcode_summary(std::string outfn, std::string surfix, std::unordered_map<std::string, int> counter, int max_bc)
 {
     std::ofstream o_file(outfn);  // output file
     int cnt = 0;
-    int dig = std::to_string(counter.size()).length()+1;
+    std::vector<std::pair<int, std::string>> items;
     for (auto const& bc: counter)
     {
-        o_file << surfix << padding(cnt, dig) << "," << bc.first << "," << bc.second << std::endl;
+        items.push_back(std::make_pair(bc.second, bc.first));
+    }
+    std::sort(items.begin(), items.end()); 
+    //the standard comparer for std::pair would be enough, as it compares first then second
+    std::reverse(items.begin(),items.end()); // highest -> lowest
+    int dig = std::to_string(items.size()).length()+1;
+    for (auto const& bc: items)
+    {
+        o_file << surfix << padding(cnt, dig) << "," << bc.second << "," << bc.first << std::endl;
         cnt++;
+        if (max_bc>0 && cnt>max_bc)
+        {
+            break;
+        }
     }
 }
     

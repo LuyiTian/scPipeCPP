@@ -15,5 +15,5 @@ KSEQ_INIT(gzFile, gzread)
 #define DETECTBARCODE_H
 
 std::unordered_map<std::string, int> summarize_barcode(std::string fn, int bc_len, int max_reads, int max_mismatch, int min_count);
-void write_barcode_summary(std::string outfn, std::string surfix, std::unordered_map<std::string, int> counter);
+void write_barcode_summary(std::string outfn, std::string surfix, std::unordered_map<std::string, int> counter, int max_bc);
 #endif
