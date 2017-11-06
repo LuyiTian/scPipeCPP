@@ -2,6 +2,7 @@
 #include <string>
 #include <stdio.h>
 #include <iostream>
+#include <unordered_map>
 #include <limits>
 #include "config_hts.h"
 #include "utils.h"

@@ -32,9 +32,9 @@ void check_file_exists(std::string fn)
 }
 
 // tally the element in vector
-std::unordered_map<std::string, int> vector_counter(std::vector<std::string> v)
+std::map<std::pair<std::string,int>, int> vector_counter(std::vector<std::pair<std::string,int>> v)
 {
-    std::unordered_map<std::string, int> counter;
+    std::map<std::pair<std::string,int>, int> counter;
     for(auto const& val: v)
     {
         if (counter.find(val) != counter.end())
@@ -43,7 +43,7 @@ std::unordered_map<std::string, int> vector_counter(std::vector<std::string> v)
         }
         else
         {
-            counter[val] = 1;
+            counter[val] =1;
         }
     }
 

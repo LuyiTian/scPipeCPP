@@ -46,9 +46,13 @@ bool test_hamming_distance()
 bool test_vector_counter()
 {
     std::cout << "\t" << "test vector_counter() ...";
-    std::vector<std::string> v = {"ATGCTAAC", "ATCTGCCC", "ATGCTAAC", "GTAGTAG"};
-    std::unordered_map<std::string, int> tmp_res = vector_counter(v);
-    return tmp_res["ATGCTAAC"] == 2;
+    std::vector<std::pair<std::string,int>> v;
+    v.push_back(std::make_pair("ATGCTAAC",100));
+    v.push_back(std::make_pair("ATGCTAAC",100));
+    v.push_back(std::make_pair("ATGCTAAC",110));
+    v.push_back(std::make_pair("ATCTGCCC",150));
+    std::map<std::pair<std::string,int>, int> tmp_res = vector_counter(v);
+    return tmp_res[std::make_pair("ATGCTAAC",100)] == 2;
 }
 
 bool test_flat_exon()
@@ -198,12 +202,12 @@ bool test_read_count()
 bool test_UMI_correct1()
 {
     std::cout << "\t" << "test UMI_correct1() ...";
-    std::unordered_map<std::string, int> test_count;
-    test_count["ATAATTA"] = 9;
-    test_count["GTAGTAG"] = 6;
-    test_count["ATAATTT"] = 1;
+    std::map<std::pair<std::string,int>, int> test_count;
+    test_count[std::make_pair("ATAATTA",100)] = 9;
+    test_count[std::make_pair("GTAGTAG",200)] = 6;
+    test_count[std::make_pair("ATAATTT",101)] = 1;
     int tmp_res = UMI_correct1(test_count);
-    bool tmp = test_count["ATAATTA"] == 10 && \
+    bool tmp = test_count[std::make_pair("ATAATTA",100)] == 10 && \
         tmp_res == 1;
     return tmp;
 }
@@ -212,9 +216,19 @@ bool test_UMI_correct1()
 bool test_UMI_dedup()
 {
     std::cout << "\t" << "test UMI_dedup() ...";
-    std::vector<std::string> v = {"ATGCTAAC", "ATCTGCCC", "ATGCTAAC", "GTAGTAG"};
-    std::vector<std::string> v1 = {"ATGCTAAC", "ATGCTAAT", "ATGCTAAC", "GTAGTAG"};
-    std::unordered_map<std::string, std::vector<std::string>> gene_read;
+    std::vector<std::pair<std::string,int>> v;
+    v.push_back(std::make_pair("ATGCTAAC",100));
+    v.push_back(std::make_pair("GTAGTAGC",100));
+    v.push_back(std::make_pair("ATGCTAAC",110));
+    v.push_back(std::make_pair("ATCTGCCC",150));
+
+    std::vector<std::pair<std::string,int>> v1;
+    v1.push_back(std::make_pair("ATGCTAAC",100));
+    v1.push_back(std::make_pair("ATGCTAAT",100));
+    v1.push_back(std::make_pair("ATGCTAAC",110));
+    v1.push_back(std::make_pair("ATCTGCCC",150));
+
+    std::unordered_map<std::string, std::vector<std::pair<std::string,int>>> gene_read;
     gene_read["GENE01"] = v;
     gene_read["GENE02"] = v;
     gene_read["GENE03"] = v1;
@@ -225,7 +239,7 @@ bool test_UMI_dedup()
     bool tmp = tmp_res["GENE01"]== 3 && \
         tmp_res["GENE03"] == 2 && \
         UMI_dup_count[2] == 1 && \
-        s.corrected_UMI == 1;
+        s.corrected_UMI == 4;
     return tmp;
 
 }

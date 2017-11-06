@@ -2,7 +2,7 @@
 #include <string>
 #include <fstream>
 #include <stdexcept>
-#include <unordered_map>
+#include <map>
 #include <sstream>
 #include <vector>
 #include <iomanip>
@@ -25,7 +25,7 @@ int hamming_distance(std::string A, std::string B);
 void check_file_exists (std::string name);
 
 // count times of occurrence in a string vector
-std::unordered_map<std::string, int> vector_counter(std::vector<std::string> v);
+std::map<std::pair<std::string,int>, int> vector_counter(std::vector<std::pair<std::string,int>> v);
 
 // the general interval class
 class Interval
